@@ -2,15 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
   <title>Master Panel — WheelsEye Truck Branding</title>
-  <meta http-equiv="refresh" content="0; url=https://script.google.com/macros/s/AKfycbym0pUBXvo8fsxNHiIHc2Je3dBjfNK6kLMHz927527CHJbikQFnoJYdnCI7FOJxGH29/exec?page=admin">
-  <script>
-    location.replace('https://script.google.com/macros/s/AKfycbym0pUBXvo8fsxNHiIHc2Je3dBjfNK6kLMHz927527CHJbikQFnoJYdnCI7FOJxGH29/exec?page=admin');
-  </script>
+  <link rel="icon" href="../icon-192.png">
+  <link rel="preconnect" href="https://script.google.com">
+  <link rel="preconnect" href="https://script.googleusercontent.com">
+  <style>
+    html, body { margin: 0; height: 100%; background: #1e3a8a; }
+    #app { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; background: #f3f6fc; }
+    #wait {
+      position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #ffffff;
+      background: linear-gradient(135deg, #0b1e5b 0%, #1e3a8a 45%, #4f46e5 100%);
+    }
+    #wait .spin { width: 38px; height: 38px; border: 4px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: s 0.9s linear infinite; }
+    #wait a { color: #ffffff; font-size: 15px; }
+    @keyframes s { to { transform: rotate(360deg); } }
+  </style>
 </head>
-<body style="font-family: system-ui, sans-serif; text-align: center; padding: 40px">
-  <p>Master Panel khul raha hai…</p>
-  <p><a href="https://script.google.com/macros/s/AKfycbym0pUBXvo8fsxNHiIHc2Je3dBjfNK6kLMHz927527CHJbikQFnoJYdnCI7FOJxGH29/exec?page=admin">Nahi khula? Yahan dabayein</a></p>
+<body>
+  <div id="wait">
+    <div class="spin" aria-hidden="true"></div>
+    <div>Master Panel khul raha hai…</div>
+    <a id="direct" href="#" hidden>Nahi khula? Yahan dabayein</a>
+  </div>
+  <iframe id="app" title="Master Panel" allow="clipboard-write *"></iframe>
+
+  <script>
+    // The "Truck Branding App" Apps Script link (ends with /exec)
+    var APP_URL = 'https://script.google.com/macros/s/AKfycbym0pUBXvo8fsxNHiIHc2Je3dBjfNK6kLMHz927527CHJbikQFnoJYdnCI7FOJxGH29/exec';
+    var src = APP_URL + '?page=admin';
+    var frame = document.getElementById('app');
+    var direct = document.getElementById('direct');
+    direct.href = src;
+    frame.addEventListener('load', function () { document.getElementById('wait').style.display = 'none'; });
+    setTimeout(function () { direct.hidden = false; }, 8000);
+    frame.src = src;
+  </script>
 </body>
 </html>
