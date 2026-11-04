@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <title>WheelsEye Truck Branding</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="WE Branding">
+  <script src="config.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #ffffff; --bg: #f3f6fc; --surface: #f1f4fa; --line: #dce3ef; --ink: #0f172a; --muted: #5b6478;
+      --brand: #1e3a8a; --brand2: #4f46e5; --brand-soft: #eef2ff; --brand-line: #c7d2fe;
+      --plate: #f5c518; --plate-ink: #141414; --ok: #15803d; --ok-bg: #e7f6ec;
+      --err: #b91c1c; --err-bg: #fdecec; --focus: #4f46e5;
+      --grad: linear-gradient(135deg, #1e3a8a 0%, #4f46e5 100%);
+      --shadow: 0 12px 32px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.05);
+      --radius-lg: 16px; --radius-sm: 10px;
+      color-scheme: light;
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html, body { margin: 0; max-width: 100%; overflow-x: hidden; }
+    body {
+      font-family: 'Hind', 'Noto Sans', 'Noto Sans Devanagari', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      color: var(--ink); font-size: 17px; line-height: 1.45; -webkit-text-size-adjust: 100%;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(600px 220px at 90% 0%, rgba(56, 189, 248, 0.35), transparent 70%),
+        linear-gradient(135deg, #0b1e5b 0%, #1e3a8a 45%, #4f46e5 100%);
+      background-repeat: no-repeat;
+      background-size: 100% 270px, 100% 270px;
+    }
+    body.modal-open { overflow: hidden; }
+
+    /* Top brand bar (on the blue band) */
+    .brandbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 18px; flex-wrap: wrap; }
+    .brand {
+      display: inline-flex; align-items: center;
+      padding: 7px 12px; background: #ffffff; border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(2, 6, 23, 0.25);
+    }
+    .brand img { display: block; height: 28px; width: auto; }
+    .brand-right { display: flex; align-items: center; gap: 8px; }
+    .brand-tag {
+      color: #ffffff; font-weight: 700; font-size: 0.92rem; letter-spacing: 0.02em;
+      padding: 6px 12px; border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 999px;
+      background: rgba(255, 255, 255, 0.10); white-space: nowrap;
+    }
+    .lang {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 6px 4px 10px; border: 1px solid rgba(255, 255, 255, 0.45); border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14); color: #ffffff;
+    }
+    .lang svg { width: 18px; height: 18px; flex: 0 0 18px; }
+    .lang select {
+      appearance: none; -webkit-appearance: none; border: 0; background: transparent; color: #ffffff;
+      font-family: inherit; font-size: 0.95rem; font-weight: 700; padding: 4px 18px 4px 2px; cursor: pointer;
+      background-image: linear-gradient(45deg, transparent 50%, #fff 50%), linear-gradient(135deg, #fff 50%, transparent 50%);
+      background-position: right 6px center, right 1px center; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat;
+    }
+    .lang select option { color: var(--ink); }
+    .lang select:focus { outline: 2px solid #ffffff; outline-offset: 2px; border-radius: 6px; }
+    @media (max-width: 520px) { .brand-tag { display: none; } }
+
+    /* White cards on the band */
+    #formView, .done, #linkView, .report, .boot {
+      background: var(--paper); border-radius: 18px; padding: 22px 18px;
+      box-shadow: var(--shadow);
+    }
+    .foot { margin: 26px 0 0; text-align: center; color: var(--muted); font-size: 0.82rem; }
+    main { max-width: 520px; margin: 0 auto; padding: 20px 18px 40px; }
+    main.wide { max-width: 1240px; }
+
+    /* Paster: form + report side by side on wide screens, tabs on phones */
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+    .layout > * { min-width: 0; }   /* never let wide content push the page wider than the phone */
+    .pane-tabs { display: flex; gap: 6px; margin: 0 0 18px; }
+    .pane-tab {
+      flex: 1; min-height: 46px; border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12); color: #ffffff;
+      font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer;
+    }
+    .pane-tab[aria-selected="true"] { background: #ffffff; color: var(--brand); border-color: #ffffff; box-shadow: 0 6px 16px rgba(2, 6, 23, 0.2); }
+    #appView.tab-form #reportPane, #appView.tab-report #formPane { display: none; }
+    #appView.vendor-mode #formPane, #appView.vendor-mode .pane-tabs { display: none !important; }
+    #appView.vendor-mode #reportPane { display: block !important; }
+    @media (min-width: 1000px) {
+      #appView.paster-mode .layout { grid-template-columns: minmax(340px, 460px) minmax(0, 1fr); align-items: start; }
+      #appView.paster-mode .pane-tabs { display: none; }
+      #appView.paster-mode #formPane, #appView.paster-mode #reportPane { display: block !important; }
+      #reportPane { position: sticky; top: 12px; }
+    }
+
+    /* Report */
+    .rep-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .rep-head h2 { margin: 0; font-size: 1.25rem; color: var(--brand); }
+    .seg { display: flex; width: 100%; max-width: 440px; padding: 4px; margin: 14px 0 12px; border-radius: 999px; background: var(--brand-soft); }
+    .seg button {
+      flex: 1; min-height: 38px; padding: 4px 6px; border: 0; border-radius: 999px; background: transparent; white-space: nowrap;
+      color: var(--ink); font-family: inherit; font-size: 0.92rem; font-weight: 600; cursor: pointer;
+    }
+    .seg button[aria-selected="true"] { background: var(--grad); color: #ffffff; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); }
+    table.rep { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    table.rep th, table.rep td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: center; white-space: nowrap; }
+    table.rep th { background: #f5f7ff; color: var(--brand); font-weight: 700; vertical-align: bottom; }
+    table.rep th small { display: block; font-weight: 400; color: var(--muted); font-size: 0.78rem; }
+    table.rep td:first-child, table.rep th:first-child { text-align: left; position: sticky; left: 0; background: var(--paper); }
+    table.rep th:first-child { background: #f5f7ff; }
+    table.rep tr.total td { font-weight: 700; }
+    table.rep tr.group td { background: var(--brand-soft); font-weight: 700; text-align: left; font-size: 0.85rem; color: var(--brand); }
+    table.rep tr:last-child td { border-bottom: 0; }
+    .num {
+      min-width: 42px; min-height: 32px; padding: 2px 8px; border: 0; border-radius: 6px;
+      background: transparent; color: var(--brand2); font-family: inherit; font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; text-decoration: underline; text-underline-offset: 3px;
+    }
+    .num:hover, .num:focus-visible { background: var(--brand-soft); outline: none; }
+    .num.sel { background: var(--plate); color: var(--plate-ink); text-decoration: none; }
+    .zero { color: var(--muted); }
+    a.dl {
+      display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 16px; border-radius: 999px;
+      background: var(--grad); color: #ffffff; font-weight: 700; font-size: 0.92rem; text-decoration: none;
+      box-shadow: 0 6px 14px rgba(79, 70, 229, 0.28);
+    }
+    a.dl[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
+    a.dl svg { width: 18px; height: 18px; }
+    table.rows { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    table.rows th, table.rows td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+    table.rows th { background: #f5f7ff; color: var(--brand); font-weight: 700; position: sticky; top: 0; }
+    table.rows tr:last-child td { border-bottom: 0; }
+    table.rows a { color: var(--focus); }
+    .plate-chip {
+      display: inline-block; padding: 1px 8px 0; background: var(--plate); color: var(--plate-ink);
+      border: 1.5px solid var(--plate-ink); border-radius: 5px; font-weight: 700; letter-spacing: 0.04em;
+    }
+
+    /* Filter box */
+    .filters {
+      margin: 22px 0 0; padding: 16px; border: 1px solid var(--brand-line); border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, #f8faff 0%, #ffffff 100%);
+    }
+    .filters h3 { margin: 0 0 10px; font-size: 1.05rem; color: var(--brand); }
+    .fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; align-items: end; }
+    .fgrid label { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; font-weight: 600; color: var(--muted); }
+    .fgrid input, .fgrid select {
+      min-height: 42px; padding: 6px 10px; border: 2px solid var(--line); border-radius: var(--radius-sm);
+      background: var(--paper); color: var(--ink); font-family: inherit; font-size: 0.95rem; width: 100%;
+    }
+    .fgrid input:focus, .fgrid select:focus { outline: 3px solid var(--focus); outline-offset: 1px; border-color: var(--ink); }
+    .fbtn {
+      min-height: 42px; padding: 6px 16px; border: 0; border-radius: var(--radius-sm);
+      background: var(--grad); color: #ffffff; font-family: inherit; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      box-shadow: 0 6px 14px rgba(79, 70, 229, 0.28);
+    }
+    .fbtn:disabled { opacity: 0.6; cursor: wait; }
+
+    header h1 { font-size: 1.45rem; font-weight: 700; line-height: 1.2; margin: 0 0 2px; color: var(--brand); }
+    header p { margin: 0 0 22px; color: var(--muted); font-size: 0.95rem; }
+
+    fieldset, .field { border: 0; padding: 0; margin: 0 0 24px; }
+    legend, .title { display: block; font-weight: 600; font-size: 1.02rem; margin-bottom: 8px; padding: 0; }
+    .sub { color: var(--muted); font-weight: 400; font-size: 0.9rem; }
+    .req { color: var(--err); font-weight: 700; }
+
+    fieldset.invalid .tile span { border-color: var(--err); background: var(--err-bg); }
+    .plate.invalid { border-color: var(--err); box-shadow: 0 0 0 2px var(--err); }
+    .capture.invalid { border-color: var(--err); background: var(--err-bg); }
+    .field-err { display: none; margin: 6px 2px 0; font-size: 0.88rem; font-weight: 600; color: var(--err); }
+    .field-err.show { display: block; }
+
+    .notice { margin-top: 12px; padding: 14px; border-radius: var(--radius-sm); background: #fff8e1; border-left: 4px solid var(--plate); }
+    .boot { text-align: center; padding: 60px 18px; color: var(--muted); }
+
+    .who {
+      display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 6px 14px;
+      padding: 12px 14px; margin: 0 0 22px;
+      border: 1px solid var(--brand-line); border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, #eef2ff 0%, #f0f9ff 100%);
+    }
+    .who-label { display: block; font-size: 0.85rem; color: var(--muted); }
+    .who strong { font-size: 1.2rem; line-height: 1.25; color: var(--brand); }
+    .who-mail { font-size: 0.88rem; color: var(--muted); text-align: right; word-break: break-all; }
+
+    .loc-line {
+      display: flex; align-items: flex-start; gap: 8px;
+      margin: -10px 0 22px; padding: 10px 12px;
+      border-radius: var(--radius-sm); background: var(--surface);
+      font-size: 0.9rem; color: var(--muted);
+    }
+    .loc-line.ok { color: var(--ok); background: var(--ok-bg); }
+    .loc-line.bad { color: var(--err); background: var(--err-bg); }
+    .loc-line svg { flex: 0 0 18px; width: 18px; height: 18px; margin-top: 2px; }
+
+    .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .tile input { position: absolute; opacity: 0; pointer-events: none; }
+    .tile span {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 64px; padding: 10px;
+      border: 2px solid var(--line); border-radius: var(--radius-sm); background: var(--paper);
+      font-weight: 600; text-align: center; cursor: pointer; transition: border-color .15s, background .15s;
+    }
+    .tile small { font-weight: 400; color: var(--muted); }
+    .tile input:checked + span { border-color: var(--brand2); background: var(--brand-soft); color: var(--brand); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15); }
+    .tile input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+    .plate { display: flex; align-items: stretch; background: var(--plate); border: 3px solid var(--plate-ink); border-radius: 10px; overflow: hidden; }
+    .plate .ind {
+      display: flex; align-items: center; padding: 0 10px;
+      font-weight: 700; font-size: 0.8rem; color: var(--plate-ink); border-right: 2px solid var(--plate-ink);
+    }
+    .plate input {
+      flex: 1; min-width: 0; width: 100%; border: 0; background: transparent; color: var(--plate-ink);
+      font-family: inherit; font-weight: 700; font-size: 1.7rem; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 10px 12px 6px; text-align: center;
+    }
+    .plate input::placeholder { color: rgba(20, 20, 20, 0.35); }
+    .plate input:focus { outline: none; }
+    .plate:focus-within { outline: 3px solid var(--focus); outline-offset: 3px; }
+    .hint { margin: 6px 2px 0; font-size: 0.88rem; color: var(--muted); }
+    .hint.bad { color: var(--err); }
+    .hint.good { color: var(--ok); }
+
+    /* Capture box: the real camera input sits on top of it, so a tap always opens the camera */
+    .capture {
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      width: 100%; min-height: 150px; padding: 16px;
+      border: 2px dashed var(--brand-line); border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, #f8faff 0%, #eef2ff 100%);
+      color: var(--brand); font-size: 1rem; text-align: center; cursor: pointer;
+    }
+    .capture input[type=file] {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      opacity: 0; cursor: pointer; font-size: 0;
+    }
+    .capture:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .capture svg { width: 36px; height: 36px; color: var(--brand2); }
+    .capture strong { font-weight: 600; }
+    .capture .sub { font-size: 0.85rem; }
+
+    .preview { position: relative; border-radius: var(--radius-lg); overflow: hidden; border: 2px solid var(--line); background: #000; }
+    .preview img, .preview video { display: block; width: 100%; max-height: 340px; object-fit: contain; }
+    .row-actions { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+    .mini {
+      position: relative; overflow: hidden;
+      display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 6px 14px;
+      border: 2px solid var(--line); border-radius: 999px; background: var(--paper);
+      color: var(--ink); font-family: inherit; font-size: 0.95rem; font-weight: 600; cursor: pointer;
+    }
+    .mini input[type=file] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 0; }
+
+    button.submit {
+      width: 100%; min-height: 56px; border: 0; border-radius: var(--radius-lg);
+      background: var(--grad); color: #ffffff;
+      font-family: inherit; font-size: 1.1rem; font-weight: 700; cursor: pointer;
+      box-shadow: 0 10px 22px rgba(79, 70, 229, 0.32);
+    }
+    button.submit:disabled { opacity: 0.55; cursor: not-allowed; }
+    button.submit:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+    .status { display: none; margin-top: 14px; padding: 12px 14px; border-radius: var(--radius-sm); font-size: 0.95rem; }
+    .status.show { display: block; }
+    .status.err { background: var(--err-bg); color: var(--err); }
+    .status.busy { background: var(--brand-soft); color: var(--brand); }
+    .status.ok { background: var(--ok-bg); color: var(--ok); }
+
+    .done { display: none; text-align: center; padding: 40px 10px; }
+    .done.show { display: block; }
+    .done .tick {
+      width: 64px; height: 64px; margin: 0 auto 14px; border-radius: 50%;
+      background: var(--ok-bg); color: var(--ok);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .done h2 { margin: 0 0 6px; font-size: 1.3rem; }
+    .done .plate-echo {
+      display: inline-block; margin: 10px 0 6px; padding: 4px 14px 0;
+      background: var(--plate); color: var(--plate-ink); border: 2px solid var(--plate-ink); border-radius: 8px;
+      font-weight: 700; font-size: 1.3rem; letter-spacing: 0.08em;
+    }
+    .done p { color: var(--muted); margin: 6px 0 24px; }
+
+    /* Entries saved on the phone, waiting for network */
+    .pending {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px;
+      margin: 0 0 14px; padding: 12px 14px; border-radius: 14px;
+      background: #fff7ed; border: 1px solid #fdba74; color: #9a3412; font-size: 0.95rem; font-weight: 600;
+    }
+    .pending.ok { background: var(--ok-bg); border-color: #86efac; color: var(--ok); }
+    .pending small { display: block; font-weight: 400; color: #9a3412; }
+    .pending .mini { min-height: 38px; }
+
+    /* Pop-ups */
+    .modal-back {
+      position: fixed; inset: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: center; padding: 16px;
+      background: rgba(15, 23, 42, 0.55);
+    }
+    .modal {
+      display: flex; flex-direction: column; width: 100%; max-width: 480px; max-height: calc(100vh - 32px);
+      background: var(--paper); border-radius: 18px; box-shadow: 0 24px 60px rgba(2, 6, 23, 0.35);
+    }
+    .modal.wide { max-width: 1000px; }
+    .modal-head { display: flex; align-items: center; gap: 10px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+    .modal-head h3 { flex: 1; margin: 0; font-size: 1.08rem; line-height: 1.3; color: var(--brand); }
+    .modal-icon {
+      flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; background: var(--err-bg); color: var(--err);
+    }
+    .modal-icon svg { width: 22px; height: 22px; }
+    .modal-x {
+      flex: 0 0 38px; width: 38px; height: 38px; border: 0; border-radius: 50%;
+      background: var(--surface); color: var(--ink); font-size: 1.3rem; line-height: 1; cursor: pointer;
+    }
+    .modal-x:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .modal-body { padding: 16px 18px; overflow: auto; }
+    .modal-body ol { margin: 10px 0 0; padding-left: 22px; }
+    .modal-body li { margin: 6px 0; }
+    .modal-reason { margin: 0 0 6px; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--err-bg); color: var(--err); font-weight: 600; }
+    .modal-foot {
+      display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 10px;
+      padding: 12px 18px; border-top: 1px solid var(--line);
+    }
+    .modal-foot .note { flex: 1; min-width: 180px; margin: 0; color: var(--muted); font-size: 0.88rem; }
+    @media (max-width: 600px) {
+      .modal-back { padding: 0; align-items: flex-end; }
+      .modal, .modal.wide { max-width: none; max-height: 92vh; border-radius: 18px 18px 0 0; }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .done.show .tick { animation: pop 0.35s ease-out; }
+      .modal-back:not([hidden]) .modal { animation: rise 0.2s ease-out; }
+      @keyframes pop { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+      @keyframes rise { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    }
+  </style>
+</head>
+<body>
+<main id="main">
+
+  <div class="brandbar">
+    <div class="brand"><img src="data:image/webp;base64,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" alt="WheelsEye" width="138" height="30"></div>
+    <div class="brand-right">
+      <span class="brand-tag" id="brandTag" data-i18n="brandTag">ट्रक ब्रांडिंग</span>
+      <label class="lang">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+        <select id="langSel" aria-label="Language"></select>
+      </label>
+    </div>
+  </div>
+
+  <p class="boot" id="bootView" data-i18n="loading">लोड हो रहा है…</p>
+
+  <section id="linkView" hidden>
+    <header><h1 data-i18n="formTitle">ट्रक ब्रांडिंग फ़ॉर्म</h1></header>
+    <div class="notice" id="linkNotice" data-i18n="linkInvalid"></div>
+  </section>
+
+  <div id="appView" hidden>
+  <div class="pane-tabs" role="tablist">
+    <button class="pane-tab" type="button" role="tab" aria-selected="true" data-pane="form" data-i18n="tabForm">फ़ॉर्म भरें</button>
+    <button class="pane-tab" type="button" role="tab" aria-selected="false" data-pane="report" data-i18n="tabReport">मेरी रिपोर्ट</button>
+  </div>
+  <div class="layout">
+  <div id="formPane">
+  <div class="pending" id="pendingBar" hidden role="status" aria-live="polite">
+    <span><span id="pendingText"></span><small id="pendingHint"></small></span>
+    <button type="button" class="mini" id="pendingSend" data-i18n="sendNow"></button>
+  </div>
+
+  <section id="formView" hidden>
+    <header>
+      <h1 data-i18n="formTitle">ट्रक ब्रांडिंग फ़ॉर्म</h1>
+      <p data-i18n="formSub"></p>
+    </header>
+
+    <div class="who">
+      <div>
+        <span class="who-label" data-i18n="vendorLabel"></span>
+        <strong id="whoVendor"></strong>
+      </div>
+      <div class="who-mail">
+        <span class="who-label" data-i18n="pasterLabel"></span>
+        <span id="whoEmail"></span>
+      </div>
+    </div>
+
+    <div class="loc-line" id="locLine">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+      <span id="locText"></span>
+    </div>
+
+    <fieldset id="stickerField">
+      <legend><span data-i18n="stickerType"></span> <span class="req">*</span> <span class="sub" data-i18n="required"></span></legend>
+      <div class="tiles">
+        <label class="tile">
+          <input type="radio" name="stickerType" value="Small">
+          <span>Small<small data-i18n="small"></small></span>
+        </label>
+        <label class="tile">
+          <input type="radio" name="stickerType" value="Large">
+          <span>Large<small data-i18n="large"></small></span>
+        </label>
+      </div>
+      <p class="field-err" id="stickerErr" data-i18n="stickerChoose"></p>
+    </fieldset>
+
+    <div class="field">
+      <label class="title" for="vehicle"><span data-i18n="vehicleNumber"></span> <span class="req">*</span> <span class="sub" data-i18n="required"></span></label>
+      <div class="plate" id="plateBox">
+        <span class="ind">IND</span>
+        <input id="vehicle" type="text" size="1" inputmode="text" autocomplete="off"
+               autocapitalize="characters" spellcheck="false" maxlength="24" placeholder="HR55AB1234">
+      </div>
+      <p class="hint" id="vehicleHint"></p>
+    </div>
+
+    <div class="field">
+      <span class="title"><span data-i18n="truckPhoto"></span> <span class="req">*</span> <span class="sub" data-i18n="required"></span></span>
+      <div class="capture" id="photoOpen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        <strong data-i18n="openCamera"></strong>
+        <span class="sub" data-i18n="cameraSub"></span>
+        <input type="file" class="photoInput" accept="image/*" capture="environment" data-i18n-aria="openCamera">
+      </div>
+      <p class="field-err" id="photoErr" data-i18n="takePhoto"></p>
+      <div id="photoDone" hidden>
+        <div class="preview"><img id="photoPreview" alt=""></div>
+        <div class="row-actions">
+          <span class="mini"><span data-i18n="retakePhoto"></span>
+            <input type="file" class="photoInput" accept="image/*" capture="environment" data-i18n-aria="retakePhoto">
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="title"><span data-i18n="truckVideo"></span> <span class="sub" data-i18n="videoSub"></span></span>
+      <div class="capture" id="videoOpen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/></svg>
+        <strong data-i18n="recordVideo"></strong>
+        <span class="sub" data-i18n="videoTip"></span>
+        <input type="file" class="videoInput" accept="video/*" capture="environment" data-i18n-aria="recordVideo">
+      </div>
+      <div id="videoDone" hidden>
+        <div class="preview"><video id="videoPreview" controls playsinline muted></video></div>
+        <div class="row-actions">
+          <span class="mini"><span data-i18n="reRecord"></span>
+            <input type="file" class="videoInput" accept="video/*" capture="environment" data-i18n-aria="reRecord">
+          </span>
+          <button type="button" class="mini" id="videoRemove" data-i18n="removeVideo"></button>
+        </div>
+      </div>
+    </div>
+
+    <button class="submit" id="submitBtn" type="button" data-i18n="submit"></button>
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+  </section>
+
+  <section class="done" id="doneView" aria-live="polite">
+    <div class="tick">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+    </div>
+    <h2 data-i18n="doneTitle"></h2>
+    <div class="plate-echo" id="doneVehicle"></div>
+    <p class="sub" id="doneVendor"></p>
+    <p id="doneMsg"></p>
+    <button class="submit" id="againBtn" type="button" data-i18n="nextTruck"></button>
+  </section>
+
+  </div><!-- /formPane -->
+
+  <div id="reportPane">
+    <section class="report">
+      <div class="rep-head">
+        <h2 id="repTitle" data-i18n="tabReport"></h2>
+        <button type="button" class="mini" id="repRefresh" data-i18n="refresh"></button>
+      </div>
+      <p class="sub" id="repSub" style="margin:4px 0 0"></p>
+
+      <div class="seg" role="tablist">
+        <button type="button" role="tab" data-g="day" aria-selected="true" data-i18n="dayWise"></button>
+        <button type="button" role="tab" data-g="week" aria-selected="false" data-i18n="weekWise"></button>
+        <button type="button" role="tab" data-g="month" aria-selected="false" data-i18n="monthWise"></button>
+      </div>
+
+      <div class="table-wrap"><table class="rep" id="repTable"><tbody><tr><td data-i18n="loading"></td></tr></tbody></table></div>
+      <p class="sub" style="margin:8px 2px 0" data-i18n="clickHint"></p>
+
+      <div class="filters">
+        <h3 data-i18n="filterTitle"></h3>
+        <div class="fgrid">
+          <label><span data-i18n="from"></span><input type="date" id="fFrom"></label>
+          <label><span data-i18n="to"></span><input type="date" id="fTo"></label>
+          <label id="fPasterWrap" hidden><span data-i18n="pasterLabel"></span><select id="fPaster"></select></label>
+          <label><span data-i18n="colSticker"></span><select id="fSticker"></select></label>
+          <label><span data-i18n="searchLabel"></span><input type="text" id="fText" placeholder="HR55AB1234, 122018"></label>
+          <button type="button" class="fbtn" id="fShow" data-i18n="showData"></button>
+        </div>
+      </div>
+    </section>
+  </div><!-- /reportPane -->
+  </div><!-- /layout -->
+  </div><!-- /appView -->
+
+  <p class="foot">WheelsEye · Truck Branding Programme</p>
+</main>
+
+<!-- Pop-up: location is off -->
+<div class="modal-back" id="locModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="locModalTitle">
+    <div class="modal-head">
+      <span class="modal-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
+      <h3 id="locModalTitle" data-i18n="locModalTitle"></h3>
+      <button type="button" class="modal-x" data-close="locModal" data-i18n-aria="close">×</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-reason" id="locModalReason"></p>
+      <p style="margin:10px 0 0" data-i18n="locModalIntro"></p>
+      <ol>
+        <li data-i18n="locStep1"></li>
+        <li data-i18n="locStep2"></li>
+        <li data-i18n="locStep3"></li>
+      </ol>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="mini" data-close="locModal" data-i18n="close"></button>
+      <button type="button" class="fbtn" id="locRetry" data-i18n="tryAgain"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Pop-up: report data -->
+<div class="modal-back" id="dataModal" hidden>
+  <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="detTitle">
+    <div class="modal-head">
+      <h3 id="detTitle"></h3>
+      <button type="button" class="modal-x" data-close="dataModal" data-i18n-aria="close">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="table-wrap"><table class="rows" id="detTable"></table></div>
+    </div>
+    <div class="modal-foot">
+      <p class="note" id="detNote"></p>
+      <button type="button" class="mini" data-close="dataModal" data-i18n="close"></button>
+      <a class="dl" id="detDownload" href="#" target="_blank" rel="noopener" aria-disabled="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+        <span data-i18n="download"></span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  var LANGS = [
+    ['hi', 'हिन्दी'], ['en', 'English'], ['kn', 'ಕನ್ನಡ'], ['ta', 'தமிழ்'],
+    ['te', 'తెలుగు'], ['mr', 'मराठी'], ['bn', 'বাংলা']
+  ];
+
+  // Each key: [hi, en, kn, ta, te, mr, bn]
+  var STR = {
+    offlineTitle:  ['फ़ोन में सेव हो गया', 'Saved on phone', 'ಫೋನ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ', 'போனில் சேமிக்கப்பட்டது', 'ఫోన్‌లో సేవ్ అయింది', 'फोनमध्ये सेव्ह झाले', 'ফোনে সেভ হয়েছে'],
+    savedOffline:  ['नेटवर्क नहीं है — एंट्री फ़ोन में सेव है। नेटवर्क आते ही अपने-आप जमा हो जाएगी।',
+                    'No network — the entry is saved on this phone and will be sent automatically when the network is back.',
+                    'ನೆಟ್‌ವರ್ಕ್ ಇಲ್ಲ — ಎಂಟ್ರಿ ಫೋನ್‌ನಲ್ಲಿ ಉಳಿದಿದೆ. ನೆಟ್‌ವರ್ಕ್ ಬಂದ ತಕ್ಷಣ ತಾನಾಗಿಯೇ ಸಲ್ಲಿಕೆಯಾಗುತ್ತದೆ.',
+                    'நெட்வொர்க் இல்லை — பதிவு போனில் சேமிக்கப்பட்டது. நெட்வொர்க் வந்ததும் தானாகச் சமர்ப்பிக்கப்படும்.',
+                    'నెట్‌వర్క్ లేదు — ఎంట్రీ ఫోన్‌లో సేవ్ అయింది. నెట్‌వర్క్ రాగానే ఆటోమేటిక్‌గా సమర్పించబడుతుంది.',
+                    'नेटवर्क नाही — एंट्री फोनमध्ये सेव्ह आहे. नेटवर्क आल्यावर आपोआप सबमिट होईल.',
+                    'নেটওয়ার্ক নেই — এন্ট্রি ফোনে সেভ আছে। নেটওয়ার্ক এলেই নিজে থেকে জমা হবে।'],
+    offlineNoVideo:['(ऑफ़लाइन में वीडियो सेव नहीं होता, सिर्फ़ फ़ोटो सेव हुई।)', '(Videos are not saved offline — only the photo was saved.)',
+                    '(ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ವೀಡಿಯೊ ಉಳಿಯುವುದಿಲ್ಲ — ಫೋಟೋ ಮಾತ್ರ ಉಳಿಸಲಾಗಿದೆ.)', '(ஆஃப்லைனில் வீடியோ சேமிக்கப்படாது — புகைப்படம் மட்டும் சேமிக்கப்பட்டது.)',
+                    '(ఆఫ్‌లైన్‌లో వీడియో సేవ్ కాదు — ఫోటో మాత్రమే సేవ్ అయింది.)', '(ऑफलाइन व्हिडिओ सेव्ह होत नाही — फक्त फोटो सेव्ह झाला.)', '(অফলাইনে ভিডিও সেভ হয় না — শুধু ছবি সেভ হয়েছে।)'],
+    pendingN:      ['{n} एंट्री भेजनी बाकी', '{n} entries waiting to be sent', '{n} ಎಂಟ್ರಿಗಳು ಕಳುಹಿಸಲು ಬಾಕಿ', '{n} பதிவுகள் அனுப்ப வேண்டியுள்ளது',
+                    '{n} ఎంట్రీలు పంపాల్సి ఉంది', '{n} एंट्री पाठवायच्या बाकी', '{n}টি এন্ট্রি পাঠানো বাকি'],
+    sendingN:      ['भेज रहे हैं… {n} बाकी', 'Sending… {n} left', 'ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ… {n} ಬಾಕಿ', 'அனுப்புகிறது… {n} மீதம்',
+                    'పంపుతోంది… {n} మిగిలింది', 'पाठवत आहोत… {n} बाकी', 'পাঠানো হচ্ছে… {n}টি বাকি'],
+    sendNow:       ['अभी भेजें', 'Send now', 'ಈಗ ಕಳುಹಿಸಿ', 'இப்போது அனுப்பு', 'ఇప్పుడు పంపండి', 'आता पाठवा', 'এখন পাঠান'],
+    allSent:       ['सब एंट्री जमा हो गईं ✓', 'All entries sent ✓', 'ಎಲ್ಲಾ ಎಂಟ್ರಿಗಳು ಸಲ್ಲಿಕೆಯಾಗಿವೆ ✓', 'அனைத்து பதிவுகளும் அனுப்பப்பட்டன ✓',
+                    'అన్ని ఎంట్రీలు పంపబడ్డాయి ✓', 'सर्व एंट्री सबमिट झाल्या ✓', 'সব এন্ট্রি জমা হয়েছে ✓'],
+    rejectedN:     ['{n} एंट्री जमा नहीं हो सकी: {r}', '{n} entries could not be saved: {r}', '{n} ಎಂಟ್ರಿ ಸಲ್ಲಿಕೆಯಾಗಲಿಲ್ಲ: {r}', '{n} பதிவு சேமிக்க முடியவில்லை: {r}',
+                    '{n} ఎంట్రీ సేవ్ కాలేదు: {r}', '{n} एंट्री सबमिट झाली नाही: {r}', '{n}টি এন্ট্রি জমা হয়নি: {r}'],
+    dontClear:     ['जब तक एंट्री न जाएँ, Chrome का डेटा साफ़ न करें।', 'Do not clear Chrome data until these are sent.', 'ಇವು ಕಳುಹಿಸುವವರೆಗೆ Chrome ಡೇಟಾ ಅಳಿಸಬೇಡಿ.',
+                    'இவை அனுப்பப்படும் வரை Chrome தரவை அழிக்க வேண்டாம்.', 'ఇవి పంపే వరకు Chrome డేటా క్లియర్ చేయవద్దు.', 'या पाठवल्या जाईपर्यंत Chrome डेटा साफ करू नका.', 'এগুলো পাঠানো না হওয়া পর্যন্ত Chrome-এর ডেটা মুছবেন না।'],
+    offlineReport: ['ऑफ़लाइन — आख़िरी सेव की गई रिपोर्ट', 'Offline — last saved report', 'ಆಫ್‌ಲೈನ್ — ಕೊನೆಯದಾಗಿ ಉಳಿಸಿದ ವರದಿ', 'ஆஃப்லைன் — கடைசியாகச் சேமித்த அறிக்கை',
+                    'ఆఫ్‌లైన్ — చివరిగా సేవ్ చేసిన రిపోర్ట్', 'ऑफलाइन — शेवटचा सेव्ह केलेला रिपोर्ट', 'অফলাইন — শেষ সেভ করা রিপোর্ট'],
+    offlineData:   ['नेटवर्क नहीं है। डेटा देखने के लिए इंटरनेट चालू करें।', 'No network. Turn on internet to see the data.', 'ನೆಟ್‌ವರ್ಕ್ ಇಲ್ಲ. ಡೇಟಾ ನೋಡಲು ಇಂಟರ್ನೆಟ್ ಆನ್ ಮಾಡಿ.',
+                    'நெட்வொர்க் இல்லை. தரவைப் பார்க்க இணையத்தை இயக்கவும்.', 'నెట్‌వర్క్ లేదు. డేటా చూడటానికి ఇంటర్నెట్ ఆన్ చేయండి.', 'नेटवर्क नाही. डेटा पाहण्यासाठी इंटरनेट चालू करा.', 'নেটওয়ার্ক নেই। ডেটা দেখতে ইন্টারনেট চালু করুন।'],
+    firstOnline:   ['पहली बार यह लिंक इंटरनेट चालू करके खोलें।', 'Open this link with internet the first time.', 'ಮೊದಲ ಬಾರಿ ಈ ಲಿಂಕ್ ಅನ್ನು ಇಂಟರ್ನೆಟ್ ಆನ್ ಮಾಡಿ ತೆರೆಯಿರಿ.',
+                    'முதல் முறை இணையத்துடன் இந்த இணைப்பைத் திறக்கவும்.', 'మొదటిసారి ఇంటర్నెట్ ఆన్ చేసి ఈ లింక్ తెరవండి.', 'पहिल्यांदा ही लिंक इंटरनेट चालू करून उघडा.', 'প্রথমবার ইন্টারনেট চালু করে এই লিঙ্কটি খুলুন।'],
+    language:      ['भाषा', 'Language', 'ಭಾಷೆ', 'மொழி', 'భాష', 'भाषा', 'ভাষা'],
+    brandTag:      ['ट्रक ब्रांडिंग', 'Truck Branding', 'ಟ್ರಕ್ ಬ್ರ್ಯಾಂಡಿಂಗ್', 'டிரக் பிராண்டிங்', 'ట్రక్ బ్రాండింగ్', 'ट्रक ब्रँडिंग', 'ট্রাক ব্র্যান্ডিং'],
+    vendorTag:     ['वेंडर रिपोर्ट', 'Vendor Report', 'ವೆಂಡರ್ ವರದಿ', 'வெண்டர் அறிக்கை', 'వెండర్ రిపోర్ట్', 'व्हेंडर रिपोर्ट', 'ভেন্ডর রিপোর্ট'],
+    loading:       ['लोड हो रहा है…', 'Loading…', 'ಲೋಡ್ ಆಗುತ್ತಿದೆ…', 'ஏற்றுகிறது…', 'లోడ్ అవుతోంది…', 'लोड होत आहे…', 'লোড হচ্ছে…'],
+    formTitle:     ['ट्रक ब्रांडिंग फ़ॉर्म', 'Truck Branding Form', 'ಟ್ರಕ್ ಬ್ರ್ಯಾಂಡಿಂಗ್ ಫಾರ್ಮ್', 'டிரக் பிராண்டிங் படிவம்', 'ట్రక్ బ్రాండింగ్ ఫారం', 'ट्रक ब्रँडिंग फॉर्म', 'ট্রাক ব্র্যান্ডিং ফর্ম'],
+    formSub:       ['स्टिकर लगाने के बाद कैमरे से ट्रक की फ़ोटो लें और जमा करें।',
+                    'After pasting the sticker, take a photo of the truck with the camera and submit.',
+                    'ಸ್ಟಿಕ್ಕರ್ ಅಂಟಿಸಿದ ನಂತರ ಕ್ಯಾಮೆರಾದಿಂದ ಟ್ರಕ್‌ನ ಫೋಟೋ ತೆಗೆದು ಸಲ್ಲಿಸಿ.',
+                    'ஸ்டிக்கர் ஒட்டிய பிறகு கேமராவில் டிரக்கின் புகைப்படம் எடுத்து சமர்ப்பிக்கவும்.',
+                    'స్టిక్కర్ అతికించిన తర్వాత కెమెరాతో ట్రక్ ఫోటో తీసి సమర్పించండి.',
+                    'स्टिकर लावल्यानंतर कॅमेऱ्याने ट्रकचा फोटो काढा आणि सबमिट करा.',
+                    'স্টিকার লাগানোর পর ক্যামেরা দিয়ে ট্রাকের ছবি তুলে জমা দিন।'],
+    linkInvalid:   ['यह link सही नहीं है या बंद कर दिया गया है। अपने वेंडर से सही link लें।',
+                    'This link is not valid or has been turned off. Ask your vendor for the correct link.',
+                    'ಈ ಲಿಂಕ್ ಸರಿಯಿಲ್ಲ ಅಥವಾ ನಿಲ್ಲಿಸಲಾಗಿದೆ. ನಿಮ್ಮ ವೆಂಡರ್‌ನಿಂದ ಸರಿಯಾದ ಲಿಂಕ್ ಪಡೆಯಿರಿ.',
+                    'இந்த இணைப்பு சரியில்லை அல்லது நிறுத்தப்பட்டுள்ளது. உங்கள் வெண்டரிடம் சரியான இணைப்பைப் பெறுங்கள்.',
+                    'ఈ లింక్ సరైనది కాదు లేదా ఆపివేయబడింది. మీ వెండర్ నుండి సరైన లింక్ తీసుకోండి.',
+                    'ही लिंक चुकीची आहे किंवा बंद केली आहे. तुमच्या व्हेंडरकडून योग्य लिंक घ्या.',
+                    'এই লিঙ্কটি সঠিক নয় বা বন্ধ করা হয়েছে। আপনার ভেন্ডরের কাছ থেকে সঠিক লিঙ্ক নিন।'],
+    notSubmitted:  [' (आपका फ़ॉर्म जमा नहीं हुआ है।)', ' (Your form was not submitted.)', ' (ನಿಮ್ಮ ಫಾರ್ಮ್ ಸಲ್ಲಿಕೆಯಾಗಿಲ್ಲ.)',
+                    ' (உங்கள் படிவம் சமர்ப்பிக்கப்படவில்லை.)', ' (మీ ఫారం సమర్పించబడలేదు.)', ' (तुमचा फॉर्म सबमिट झालेला नाही.)', ' (আপনার ফর্ম জমা হয়নি।)'],
+    tabForm:       ['फ़ॉर्म भरें', 'Fill form', 'ಫಾರ್ಮ್ ಭರ್ತಿ', 'படிவம் நிரப்பு', 'ఫారం నింపండి', 'फॉर्म भरा', 'ফর্ম পূরণ'],
+    tabReport:     ['मेरी रिपोर्ट', 'My report', 'ನನ್ನ ವರದಿ', 'என் அறிக்கை', 'నా రిపోర్ట్', 'माझा रिपोर्ट', 'আমার রিপোর্ট'],
+    vendorLabel:   ['वेंडर (कंपनी)', 'Vendor (Company)', 'ವೆಂಡರ್ (ಕಂಪನಿ)', 'வெண்டர் (நிறுவனம்)', 'వెండర్ (కంపెనీ)', 'व्हेंडर (कंपनी)', 'ভেন্ডর (কোম্পানি)'],
+    pasterLabel:   ['पेस्टर', 'Paster', 'ಪೇಸ್ಟರ್', 'பேஸ்டர்', 'పేస్టర్', 'पेस्टर', 'পেস্টার'],
+    required:      ['ज़रूरी', 'required', 'ಕಡ್ಡಾಯ', 'கட்டாயம்', 'తప్పనిసరి', 'आवश्यक', 'আবশ্যক'],
+    stickerType:   ['स्टिकर टाइप', 'Sticker type', 'ಸ್ಟಿಕ್ಕರ್ ಪ್ರಕಾರ', 'ஸ்டிக்கர் வகை', 'స్టిక్కర్ రకం', 'स्टिकर प्रकार', 'স্টিকারের ধরন'],
+    small:         ['छोटा', '', 'ಸಣ್ಣ', 'சிறியது', 'చిన్నది', 'लहान', 'ছোট'],
+    large:         ['बड़ा', '', 'ದೊಡ್ಡ', 'பெரியது', 'పెద్దది', 'मोठा', 'বড়'],
+    stickerChoose: ['स्टिकर टाइप चुनें', 'Choose the sticker type', 'ಸ್ಟಿಕ್ಕರ್ ಪ್ರಕಾರ ಆಯ್ಕೆಮಾಡಿ', 'ஸ்டிக்கர் வகையைத் தேர்ந்தெடுக்கவும்',
+                    'స్టిక్కర్ రకాన్ని ఎంచుకోండి', 'स्टिकर प्रकार निवडा', 'স্টিকারের ধরন বেছে নিন'],
+    vehicleNumber: ['गाड़ी नंबर', 'Vehicle number', 'ವಾಹನ ಸಂಖ್ಯೆ', 'வாகன எண்', 'వాహన నంబర్', 'गाडी नंबर', 'গাড়ির নম্বর'],
+    vehicleExample:['जैसे HR55AB1234 · नई गाड़ी का नंबर न हो तो टेम्परेरी / बिल वाला नंबर डालें',
+                    'e.g. HR55AB1234 · For a new truck, enter the temporary / invoice number',
+                    'ಉದಾ: HR55AB1234 · ಹೊಸ ವಾಹನಕ್ಕೆ ತಾತ್ಕಾಲಿಕ / ಬಿಲ್ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ',
+                    'எ.கா. HR55AB1234 · புதிய வாகனம் என்றால் தற்காலிக / பில் எண்ணை உள்ளிடவும்',
+                    'ఉదా: HR55AB1234 · కొత్త వాహనమైతే తాత్కాలిక / బిల్ నంబర్ నమోదు చేయండి',
+                    'उदा. HR55AB1234 · नवीन गाडी असल्यास तात्पुरता / बिलवरील नंबर टाका',
+                    'যেমন HR55AB1234 · নতুন গাড়ি হলে অস্থায়ী / বিলের নম্বর লিখুন'],
+    vehicleEnter:  ['गाड़ी नंबर डालें (नई गाड़ी हो तो टेम्परेरी / बिल वाला नंबर)', 'Enter the vehicle number (temporary / invoice number for a new truck)',
+                    'ವಾಹನ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ (ಹೊಸ ವಾಹನಕ್ಕೆ ತಾತ್ಕಾಲಿಕ / ಬಿಲ್ ಸಂಖ್ಯೆ)', 'வாகன எண்ணை உள்ளிடவும் (புதிய வாகனத்திற்கு தற்காலிக / பில் எண்)',
+                    'వాహన నంబర్ నమోదు చేయండి (కొత్త వాహనానికి తాత్కాలిక / బిల్ నంబర్)', 'गाडी नंबर टाका (नवीन गाडीसाठी तात्पुरता / बिलवरील नंबर)', 'গাড়ির নম্বর লিখুন (নতুন গাড়ির জন্য অস্থায়ী / বিলের নম্বর)'],
+    truckPhoto:    ['ट्रक फ़ोटो', 'Truck photo', 'ಟ್ರಕ್ ಫೋಟೋ', 'டிரக் புகைப்படம்', 'ట్రక్ ఫోటో', 'ट्रक फोटो', 'ট্রাকের ছবি'],
+    openCamera:    ['कैमरा खोलें', 'Open camera', 'ಕ್ಯಾಮೆರಾ ತೆರೆಯಿರಿ', 'கேமராவைத் திற', 'కెమెరా తెరవండి', 'कॅमेरा उघडा', 'ক্যামেরা খুলুন'],
+    cameraSub:     ['स्टिकर और नंबर प्लेट दोनों दिखें', 'Both the sticker and number plate should be visible', 'ಸ್ಟಿಕ್ಕರ್ ಮತ್ತು ನಂಬರ್ ಪ್ಲೇಟ್ ಎರಡೂ ಕಾಣಬೇಕು',
+                    'ஸ்டிக்கரும் நம்பர் பிளேட்டும் இரண்டும் தெரிய வேண்டும்', 'స్టిక్కర్ మరియు నంబర్ ప్లేట్ రెండూ కనిపించాలి', 'स्टिकर आणि नंबर प्लेट दोन्ही दिसले पाहिजेत', 'স্টিকার ও নম্বর প্লেট দুটোই যেন দেখা যায়'],
+    takePhoto:     ['कैमरे से फ़ोटो लें', 'Take a photo with the camera', 'ಕ್ಯಾಮೆರಾದಿಂದ ಫೋಟೋ ತೆಗೆಯಿರಿ', 'கேமராவில் புகைப்படம் எடுக்கவும்',
+                    'కెమెరాతో ఫోటో తీయండి', 'कॅमेऱ्याने फोटो काढा', 'ক্যামেরা দিয়ে ছবি তুলুন'],
+    retakePhoto:   ['दोबारा फ़ोटो लें', 'Retake photo', 'ಮತ್ತೆ ಫೋಟೋ ತೆಗೆಯಿರಿ', 'மீண்டும் புகைப்படம் எடு', 'మళ్ళీ ఫోటో తీయండి', 'पुन्हा फोटो काढा', 'আবার ছবি তুলুন'],
+    truckVideo:    ['ट्रक वीडियो', 'Truck video', 'ಟ್ರಕ್ ವೀಡಿಯೊ', 'டிரக் வீடியோ', 'ట్రక్ వీడియో', 'ट्रक व्हिडिओ', 'ট্রাকের ভিডিও'],
+    videoSub:      ['वैकल्पिक, अधिकतम 20 सेकंड', 'optional, up to 20 seconds', 'ಐಚ್ಛಿಕ, ಗರಿಷ್ಠ 20 ಸೆಕೆಂಡುಗಳು', 'விருப்பம், அதிகபட்சம் 20 வினாடிகள்',
+                    'ఐచ్ఛికం, గరిష్ఠం 20 సెకన్లు', 'ऐच्छिक, जास्तीत जास्त 20 सेकंद', 'ঐচ্ছিক, সর্বোচ্চ 20 সেকেন্ড'],
+    recordVideo:   ['वीडियो रिकॉर्ड करें', 'Record video', 'ವೀಡಿಯೊ ರೆಕಾರ್ಡ್ ಮಾಡಿ', 'வீடியோ பதிவு செய்', 'వీడియో రికార్డ్ చేయండి', 'व्हिडिओ रेकॉर्ड करा', 'ভিডিও রেকর্ড করুন'],
+    videoTip:      ['ट्रक के चारों ओर घूमकर, 10–15 सेकंड', 'Walk around the truck, 10–15 seconds', 'ಟ್ರಕ್ ಸುತ್ತ ತಿರುಗಿ, 10–15 ಸೆಕೆಂಡುಗಳು',
+                    'டிரக்கைச் சுற்றி நடந்து, 10–15 வினாடிகள்', 'ట్రక్ చుట్టూ తిరుగుతూ, 10–15 సెకన్లు', 'ट्रकभोवती फिरून, 10–15 सेकंद', 'ট্রাকের চারপাশে ঘুরে, 10–15 সেকেন্ড'],
+    reRecord:      ['दोबारा रिकॉर्ड करें', 'Record again', 'ಮತ್ತೆ ರೆಕಾರ್ಡ್ ಮಾಡಿ', 'மீண்டும் பதிவு செய்', 'మళ్ళీ రికార్డ్ చేయండి', 'पुन्हा रेकॉर्ड करा', 'আবার রেকর্ড করুন'],
+    removeVideo:   ['वीडियो हटाएँ', 'Remove video', 'ವೀಡಿಯೊ ತೆಗೆದುಹಾಕಿ', 'வீடியோவை நீக்கு', 'వీడియో తొలగించండి', 'व्हिडिओ काढा', 'ভিডিও সরান'],
+    submit:        ['जमा करें', 'Submit', 'ಸಲ್ಲಿಸಿ', 'சமர்ப்பி', 'సమర్పించండి', 'सबमिट करा', 'জমা দিন'],
+    submitting:    ['जमा हो रहा है…', 'Submitting…', 'ಸಲ್ಲಿಸಲಾಗುತ್ತಿದೆ…', 'சமர்ப்பிக்கிறது…', 'సమర్పిస్తోంది…', 'सबमिट होत आहे…', 'জমা হচ্ছে…'],
+    fillRequired:  ['कृपया ये ज़रूरी जानकारी भरें: ', 'Please fill in: ', 'ದಯವಿಟ್ಟು ಇವುಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ: ', 'தயவுசெய்து இவற்றை நிரப்பவும்: ',
+                    'దయచేసి ఇవి నింపండి: ', 'कृपया हे भरा: ', 'অনুগ্রহ করে এগুলি পূরণ করুন: '],
+    uploadingBoth: ['फ़ोटो और वीडियो अपलोड हो रहे हैं… पेज बंद न करें।', 'Uploading photo and video… do not close the page.',
+                    'ಫೋಟೋ ಮತ್ತು ವೀಡಿಯೊ ಅಪ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ… ಪುಟವನ್ನು ಮುಚ್ಚಬೇಡಿ.', 'புகைப்படமும் வீடியோவும் பதிவேற்றப்படுகிறது… பக்கத்தை மூடாதீர்கள்.',
+                    'ఫోటో మరియు వీడియో అప్‌లోడ్ అవుతోంది… పేజీ మూసివేయవద్దు.', 'फोटो आणि व्हिडिओ अपलोड होत आहेत… पेज बंद करू नका.', 'ছবি ও ভিডিও আপলোড হচ্ছে… পেজ বন্ধ করবেন না।'],
+    uploadingPhoto:['फ़ोटो अपलोड हो रही है… पेज बंद न करें।', 'Uploading photo… do not close the page.', 'ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ… ಪುಟವನ್ನು ಮುಚ್ಚಬೇಡಿ.',
+                    'புகைப்படம் பதிவேற்றப்படுகிறது… பக்கத்தை மூடாதீர்கள்.', 'ఫోటో అప్‌లోడ్ అవుతోంది… పేజీ మూసివేయవద్దు.', 'फोटो अपलोड होत आहे… पेज बंद करू नका.', 'ছবি আপলোড হচ্ছে… পেজ বন্ধ করবেন না।'],
+    submitFail:    ['जमा नहीं हो सका। नेटवर्क चेक करके दोबारा कोशिश करें।', 'Could not submit. Check your network and try again.',
+                    'ಸಲ್ಲಿಸಲಾಗಲಿಲ್ಲ. ನೆಟ್‌ವರ್ಕ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.', 'சமர்ப்பிக்க முடியவில்லை. நெட்வொர்க்கைச் சரிபார்த்து மீண்டும் முயலவும்.',
+                    'సమర్పించలేకపోయాం. నెట్‌వర్క్ చూసి మళ్ళీ ప్రయత్నించండి.', 'सबमिट झाले नाही. नेटवर्क तपासा आणि पुन्हा प्रयत्न करा.', 'জমা দেওয়া যায়নি। নেটওয়ার্ক দেখে আবার চেষ্টা করুন।'],
+    doneTitle:     ['जमा हो गया', 'Submitted', 'ಸಲ್ಲಿಸಲಾಗಿದೆ', 'சமர்ப்பிக்கப்பட்டது', 'సమర్పించబడింది', 'सबमिट झाले', 'জমা হয়েছে'],
+    savedOk:       ['जानकारी सफलतापूर्वक जमा हो गई।', 'Your entry has been saved.', 'ಮಾಹಿತಿ ಯಶಸ್ವಿಯಾಗಿ ಸಲ್ಲಿಕೆಯಾಗಿದೆ.', 'தகவல் வெற்றிகரமாகச் சேமிக்கப்பட்டது.',
+                    'సమాచారం విజయవంతంగా సమర్పించబడింది.', 'माहिती यशस्वीरीत्या सबमिट झाली.', 'তথ্য সফলভাবে জমা হয়েছে।'],
+    duplicateNote: ['(ध्यान दें: यह गाड़ी पिछले {h} घंटे में पहले भी जमा हो चुकी है।)', '(Note: this vehicle was already submitted in the last {h} hours.)',
+                    '(ಗಮನಿಸಿ: ಈ ವಾಹನವನ್ನು ಕಳೆದ {h} ಗಂಟೆಗಳಲ್ಲಿ ಈಗಾಗಲೇ ಸಲ್ಲಿಸಲಾಗಿದೆ.)', '(குறிப்பு: இந்த வாகனம் கடந்த {h} மணி நேரத்தில் ஏற்கனவே சமர்ப்பிக்கப்பட்டுள்ளது.)',
+                    '(గమనిక: ఈ వాహనం గత {h} గంటల్లో ఇప్పటికే సమర్పించబడింది.)', '(लक्षात घ्या: ही गाडी मागील {h} तासांत आधीच सबमिट झाली आहे.)', '(লক্ষ্য করুন: এই গাড়িটি গত {h} ঘণ্টায় আগেই জমা হয়েছে।)'],
+    nextTruck:     ['अगला ट्रक जमा करें', 'Submit next truck', 'ಮುಂದಿನ ಟ್ರಕ್ ಸಲ್ಲಿಸಿ', 'அடுத்த டிரக்கைச் சமர்ப்பி', 'తదుపరి ట్రక్ సమర్పించండి', 'पुढचा ट्रक सबमिट करा', 'পরের ট্রাক জমা দিন'],
+    vendorPrefix:  ['वेंडर: ', 'Vendor: ', 'ವೆಂಡರ್: ', 'வெண்டர்: ', 'వెండర్: ', 'व्हेंडर: ', 'ভেন্ডর: '],
+    notPhoto:      ['यह फ़ोटो नहीं है। कैमरे से ट्रक की फ़ोटो लें।', 'This is not a photo. Take a photo of the truck with the camera.',
+                    'ಇದು ಫೋಟೋ ಅಲ್ಲ. ಕ್ಯಾಮೆರಾದಿಂದ ಟ್ರಕ್‌ನ ಫೋಟೋ ತೆಗೆಯಿರಿ.', 'இது புகைப்படம் அல்ல. கேமராவில் டிரக்கின் புகைப்படம் எடுக்கவும்.',
+                    'ఇది ఫోటో కాదు. కెమెరాతో ట్రక్ ఫోటో తీయండి.', 'हा फोटो नाही. कॅमेऱ्याने ट्रकचा फोटो काढा.', 'এটি ছবি নয়। ক্যামেরা দিয়ে ট্রাকের ছবি তুলুন।'],
+    oldPhoto:      ['यह पुरानी / गैलरी की फ़ोटो है। कैमरे से अभी नई फ़ोटो लें।', 'This is an old / gallery photo. Take a new photo with the camera now.',
+                    'ಇದು ಹಳೆಯ / ಗ್ಯಾಲರಿ ಫೋಟೋ. ಈಗ ಕ್ಯಾಮೆರಾದಿಂದ ಹೊಸ ಫೋಟೋ ತೆಗೆಯಿರಿ.', 'இது பழைய / கேலரி புகைப்படம். இப்போது கேமராவில் புதிய புகைப்படம் எடுக்கவும்.',
+                    'ఇది పాత / గ్యాలరీ ఫోటో. ఇప్పుడు కెమెరాతో కొత్త ఫోటో తీయండి.', 'हा जुना / गॅलरीतील फोटो आहे. आता कॅमेऱ्याने नवीन फोटो काढा.', 'এটি পুরনো / গ্যালারির ছবি। এখন ক্যামেরা দিয়ে নতুন ছবি তুলুন।'],
+    photoPreparing:['फ़ोटो तैयार हो रही है…', 'Preparing photo…', 'ಫೋಟೋ ಸಿದ್ಧವಾಗುತ್ತಿದೆ…', 'புகைப்படம் தயாராகிறது…', 'ఫోటో సిద్ధమవుతోంది…', 'फोटो तयार होत आहे…', 'ছবি তৈরি হচ্ছে…'],
+    photoReadFail: ['फ़ोटो पढ़ी नहीं जा सकी। कृपया दोबारा फ़ोटो लें।', 'Could not read the photo. Please take it again.', 'ಫೋಟೋ ಓದಲಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ತೆಗೆಯಿರಿ.',
+                    'புகைப்படத்தைப் படிக்க முடியவில்லை. மீண்டும் எடுக்கவும்.', 'ఫోటో చదవలేకపోయాం. దయచేసి మళ్ళీ తీయండి.', 'फोटो वाचता आला नाही. कृपया पुन्हा काढा.', 'ছবিটি পড়া যায়নি। আবার তুলুন।'],
+    notVideo:      ['यह वीडियो नहीं है। कैमरे से वीडियो रिकॉर्ड करें।', 'This is not a video. Record a video with the camera.', 'ಇದು ವೀಡಿಯೊ ಅಲ್ಲ. ಕ್ಯಾಮೆರಾದಿಂದ ವೀಡಿಯೊ ರೆಕಾರ್ಡ್ ಮಾಡಿ.',
+                    'இது வீடியோ அல்ல. கேமராவில் வீடியோ பதிவு செய்யவும்.', 'ఇది వీడియో కాదు. కెమెరాతో వీడియో రికార్డ్ చేయండి.', 'हा व्हिडिओ नाही. कॅमेऱ्याने व्हिडिओ रेकॉर्ड करा.', 'এটি ভিডিও নয়। ক্যামেরা দিয়ে ভিডিও রেকর্ড করুন।'],
+    oldVideo:      ['यह पुराना / गैलरी का वीडियो है। कैमरे से अभी नया वीडियो रिकॉर्ड करें।', 'This is an old / gallery video. Record a new one with the camera now.',
+                    'ಇದು ಹಳೆಯ / ಗ್ಯಾಲರಿ ವೀಡಿಯೊ. ಈಗ ಕ್ಯಾಮೆರಾದಿಂದ ಹೊಸ ವೀಡಿಯೊ ರೆಕಾರ್ಡ್ ಮಾಡಿ.', 'இது பழைய / கேலரி வீடியோ. இப்போது கேமராவில் புதிய வீடியோ பதிவு செய்யவும்.',
+                    'ఇది పాత / గ్యాలరీ వీడియో. ఇప్పుడు కెమెరాతో కొత్త వీడియో రికార్డ్ చేయండి.', 'हा जुना / गॅलरीतील व्हिडिओ आहे. आता कॅमेऱ्याने नवीन व्हिडिओ रेकॉर्ड करा.', 'এটি পুরনো / গ্যালারির ভিডিও। এখন ক্যামেরা দিয়ে নতুন ভিডিও রেকর্ড করুন।'],
+    videoTooBig:   ['वीडियो 15 MB से बड़ा है। 10–15 सेकंड का छोटा वीडियो रिकॉर्ड करें।', 'Video is larger than 15 MB. Record a shorter 10–15 second video.',
+                    'ವೀಡಿಯೊ 15 MB ಗಿಂತ ದೊಡ್ಡದು. 10–15 ಸೆಕೆಂಡುಗಳ ಚಿಕ್ಕ ವೀಡಿಯೊ ರೆಕಾರ್ಡ್ ಮಾಡಿ.', 'வீடியோ 15 MB-ஐ விடப் பெரியது. 10–15 வினாடி சிறிய வீடியோ பதிவு செய்யவும்.',
+                    'వీడియో 15 MB కంటే పెద్దది. 10–15 సెకన్ల చిన్న వీడియో రికార్డ్ చేయండి.', 'व्हिडिओ 15 MB पेक्षा मोठा आहे. 10–15 सेकंदांचा लहान व्हिडिओ रेकॉर्ड करा.', 'ভিডিওটি 15 MB-এর বেশি। 10–15 সেকেন্ডের ছোট ভিডিও রেকর্ড করুন।'],
+    videoTooLong:  ['वीडियो {s} सेकंड का है। {max} सेकंड तक का वीडियो रिकॉर्ड करें।', 'Video is {s} seconds long. Record up to {max} seconds.',
+                    'ವೀಡಿಯೊ {s} ಸೆಕೆಂಡುಗಳಿದೆ. {max} ಸೆಕೆಂಡುಗಳವರೆಗೆ ರೆಕಾರ್ಡ್ ಮಾಡಿ.', 'வீடியோ {s} வினாடிகள் உள்ளது. {max} வினாடி வரை பதிவு செய்யவும்.',
+                    'వీడియో {s} సెకన్లు ఉంది. {max} సెకన్ల వరకు రికార్డ్ చేయండి.', 'व्हिडिओ {s} सेकंदांचा आहे. {max} सेकंदांपर्यंत रेकॉर्ड करा.', 'ভিডিওটি {s} সেকেন্ডের। {max} সেকেন্ড পর্যন্ত রেকর্ড করুন।'],
+    videoPreparing:['वीडियो तैयार हो रहा है…', 'Preparing video…', 'ವೀಡಿಯೊ ಸಿದ್ಧವಾಗುತ್ತಿದೆ…', 'வீடியோ தயாராகிறது…', 'వీడియో సిద్ధమవుతోంది…', 'व्हिडिओ तयार होत आहे…', 'ভিডিও তৈরি হচ্ছে…'],
+    videoSaveFail: ['वीडियो सेव नहीं हो सका। कृपया दोबारा रिकॉर्ड करें।', 'Could not save the video. Please record again.', 'ವೀಡಿಯೊ ಉಳಿಸಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ರೆಕಾರ್ಡ್ ಮಾಡಿ.',
+                    'வீடியோவைச் சேமிக்க முடியவில்லை. மீண்டும் பதிவு செய்யவும்.', 'వీడియో సేవ్ కాలేదు. మళ్ళీ రికార్డ్ చేయండి.', 'व्हिडिओ सेव्ह झाला नाही. पुन्हा रेकॉर्ड करा.', 'ভিডিও সেভ করা যায়নি। আবার রেকর্ড করুন।'],
+    locGetting:    ['लोकेशन ली जा रही है…', 'Getting location…', 'ಸ್ಥಳ ಪಡೆಯಲಾಗುತ್ತಿದೆ…', 'இருப்பிடம் பெறப்படுகிறது…', 'లొకేషన్ తీసుకుంటోంది…', 'लोकेशन घेतले जात आहे…', 'লোকেশন নেওয়া হচ্ছে…'],
+    locNoBrowser:  ['यह ब्राउज़र लोकेशन सपोर्ट नहीं करता। लिंक को Chrome में खोलें।', 'This browser does not support location. Open the link in Chrome.',
+                    'ಈ ಬ್ರೌಸರ್ ಸ್ಥಳವನ್ನು ಬೆಂಬಲಿಸುವುದಿಲ್ಲ. ಲಿಂಕ್ ಅನ್ನು Chrome ನಲ್ಲಿ ತೆರೆಯಿರಿ.', 'இந்த உலாவி இருப்பிடத்தை ஆதரிக்காது. இணைப்பை Chrome-ல் திறக்கவும்.',
+                    'ఈ బ్రౌజర్ లొకేషన్‌ను సపోర్ట్ చేయదు. లింక్‌ను Chromeలో తెరవండి.', 'हा ब्राउझर लोकेशनला सपोर्ट करत नाही. लिंक Chrome मध्ये उघडा.', 'এই ব্রাউজার লোকেশন সাপোর্ট করে না। লিঙ্কটি Chrome-এ খুলুন।'],
+    locDenied:     ['लोकेशन की अनुमति नहीं मिली।', 'Location permission was not given.', 'ಸ್ಥಳದ ಅನುಮತಿ ಸಿಕ್ಕಿಲ್ಲ.', 'இருப்பிட அனுமதி கிடைக்கவில்லை.',
+                    'లొకేషన్ అనుమతి ఇవ్వలేదు.', 'लोकेशनची परवानगी मिळाली नाही.', 'লোকেশনের অনুমতি দেওয়া হয়নি।'],
+    locTimeout:    ['लोकेशन मिलने में देर हो रही है। खुले में आकर दोबारा कोशिश करें।', 'Location is taking too long. Move to an open area and try again.',
+                    'ಸ್ಥಳ ಸಿಗಲು ತಡವಾಗುತ್ತಿದೆ. ತೆರೆದ ಜಾಗಕ್ಕೆ ಬಂದು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.', 'இருப்பிடம் கிடைக்கத் தாமதமாகிறது. திறந்த இடத்திற்கு வந்து மீண்டும் முயலவும்.',
+                    'లొకేషన్ రావడానికి ఆలస్యమవుతోంది. ఖాళీ ప్రదేశానికి వచ్చి మళ్ళీ ప్రయత్నించండి.', 'लोकेशन मिळायला उशीर होत आहे. मोकळ्या जागी येऊन पुन्हा प्रयत्न करा.', 'লোকেশন পেতে দেরি হচ্ছে। খোলা জায়গায় এসে আবার চেষ্টা করুন।'],
+    locOff:        ['लोकेशन नहीं मिली। फ़ोन की Location (GPS) चालू करें।', "Location not found. Turn on your phone's Location (GPS).",
+                    'ಸ್ಥಳ ಸಿಗಲಿಲ್ಲ. ಫೋನ್‌ನ Location (GPS) ಆನ್ ಮಾಡಿ.', 'இருப்பிடம் கிடைக்கவில்லை. போனின் Location (GPS)-ஐ ஆன் செய்யவும்.',
+                    'లొకేషన్ దొరకలేదు. ఫోన్ Location (GPS) ఆన్ చేయండి.', 'लोकेशन मिळाले नाही. फोनचे Location (GPS) चालू करा.', 'লোকেশন পাওয়া যায়নি। ফোনের Location (GPS) চালু করুন।'],
+    locModalTitle: ['लोकेशन चालू नहीं है', 'Location is off', 'ಸ್ಥಳ ಆನ್ ಆಗಿಲ್ಲ', 'இருப்பிடம் ஆன் செய்யப்படவில்லை', 'లొకేషన్ ఆన్‌లో లేదు', 'लोकेशन चालू नाही', 'লোকেশন চালু নেই'],
+    locModalIntro: ['फ़ॉर्म जमा करने के लिए फ़ोटो पर लोकेशन ज़रूरी है।', 'Location is required on the photo to submit the form.', 'ಫಾರ್ಮ್ ಸಲ್ಲಿಸಲು ಫೋಟೋದಲ್ಲಿ ಸ್ಥಳ ಕಡ್ಡಾಯ.',
+                    'படிவத்தைச் சமர்ப்பிக்க புகைப்படத்தில் இருப்பிடம் கட்டாயம்.', 'ఫారం సమర్పించడానికి ఫోటోపై లొకేషన్ తప్పనిసరి.', 'फॉर्म सबमिट करण्यासाठी फोटोवर लोकेशन आवश्यक आहे.', 'ফর্ম জমা দিতে ছবিতে লোকেশন আবশ্যক।'],
+    locStep1:      ['फ़ोन की Location (GPS) चालू करें।', "Turn on your phone's Location (GPS).", 'ಫೋನ್‌ನ Location (GPS) ಆನ್ ಮಾಡಿ.', 'போனின் Location (GPS)-ஐ ஆன் செய்யவும்.',
+                    'ఫోన్ Location (GPS) ఆన్ చేయండి.', 'फोनचे Location (GPS) चालू करा.', 'ফোনের Location (GPS) চালু করুন।'],
+    locStep2:      ['Chrome में ऊपर 🔒 दबाएँ → Permissions → Location → Allow करें।', 'In Chrome tap 🔒 at the top → Permissions → Location → Allow.',
+                    'Chrome ನಲ್ಲಿ ಮೇಲೆ 🔒 ಒತ್ತಿ → Permissions → Location → Allow.', 'Chrome-ல் மேலே 🔒 அழுத்தவும் → Permissions → Location → Allow.',
+                    'Chromeలో పైన 🔒 నొక్కండి → Permissions → Location → Allow.', 'Chrome मध्ये वर 🔒 दाबा → Permissions → Location → Allow करा.', 'Chrome-এ উপরে 🔒 চাপুন → Permissions → Location → Allow করুন।'],
+    locStep3:      ['फिर नीचे "दोबारा कोशिश करें" दबाएँ।', 'Then tap "Try again" below.', 'ನಂತರ ಕೆಳಗಿನ "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ" ಒತ್ತಿ.', 'பின்னர் கீழே உள்ள "மீண்டும் முயல்க" அழுத்தவும்.',
+                    'తర్వాత కింద "మళ్ళీ ప్రయత్నించండి" నొక్కండి.', 'मग खाली "पुन्हा प्रयत्न करा" दाबा.', 'তারপর নিচে "আবার চেষ্টা করুন" চাপুন।'],
+    tryAgain:      ['दोबारा कोशिश करें', 'Try again', 'ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ', 'மீண்டும் முயல்க', 'మళ్ళీ ప్రయత్నించండి', 'पुन्हा प्रयत्न करा', 'আবার চেষ্টা করুন'],
+    locFound:      ['लोकेशन मिल गई। अब "जमा करें" दबाएँ।', 'Location found. Now tap "Submit".', 'ಸ್ಥಳ ಸಿಕ್ಕಿತು. ಈಗ "ಸಲ್ಲಿಸಿ" ಒತ್ತಿ.', 'இருப்பிடம் கிடைத்தது. இப்போது "சமர்ப்பி" அழுத்தவும்.',
+                    'లొకేషన్ దొరికింది. ఇప్పుడు "సమర్పించండి" నొక్కండి.', 'लोकेशन मिळाले. आता "सबमिट करा" दाबा.', 'লোকেশন পাওয়া গেছে। এখন "জমা দিন" চাপুন।'],
+    close:         ['बंद करें', 'Close', 'ಮುಚ್ಚಿ', 'மூடு', 'మూసివేయి', 'बंद करा', 'বন্ধ করুন'],
+    refresh:       ['रीफ़्रेश', 'Refresh', 'ರಿಫ್ರೆಶ್', 'புதுப்பி', 'రిఫ్రెష్', 'रिफ्रेश', 'রিফ্রেশ'],
+    dayWise:       ['दिन-वार', 'Day-wise', 'ದಿನವಾರು', 'நாள் வாரியாக', 'రోజువారీ', 'दिवसनिहाय', 'দিন অনুযায়ী'],
+    weekWise:      ['हफ़्ता-वार', 'Week-wise', 'ವಾರವಾರು', 'வாரம் வாரியாக', 'వారంవారీ', 'आठवडानिहाय', 'সপ্তাহ অনুযায়ী'],
+    monthWise:     ['महीना-वार', 'Month-wise', 'ತಿಂಗಳುವಾರು', 'மாதம் வாரியாக', 'నెలవారీ', 'महिनानिहाय', 'মাস অনুযায়ী'],
+    today:         ['आज', 'Today', 'ಇಂದು', 'இன்று', 'ఈరోజు', 'आज', 'আজ'],
+    totalEntries:  ['कुल एंट्री', 'Total entries', 'ಒಟ್ಟು ಎಂಟ್ರಿಗಳು', 'மொத்த பதிவுகள்', 'మొత్తం ఎంట్రీలు', 'एकूण एंट्री', 'মোট এন্ট্রি'],
+    stickerPrefix: ['स्टिकर: ', 'Sticker: ', 'ಸ್ಟಿಕ್ಕರ್: ', 'ஸ்டிக்கர்: ', 'స్టిక్కర్: ', 'स्टिकर: ', 'স্টিকার: '],
+    pasterWise:    ['पेस्टर-वार', 'Paster-wise', 'ಪೇಸ್ಟರ್‌ವಾರು', 'பேஸ்டர் வாரியாக', 'పేస్టర్‌వారీ', 'पेस्टरनिहाय', 'পেস্টার অনুযায়ী'],
+    clickHint:     ['किसी भी नंबर पर क्लिक करें — उसका पूरा डेटा खुलेगा और डाउनलोड भी कर सकते हैं।', 'Tap any number to open its entries and download them.',
+                    'ಯಾವುದೇ ಸಂಖ್ಯೆಯನ್ನು ಒತ್ತಿ — ಅದರ ಎಂಟ್ರಿಗಳು ತೆರೆಯುತ್ತವೆ, ಡೌನ್‌ಲೋಡ್ ಕೂಡ ಮಾಡಬಹುದು.', 'எந்த எண்ணையும் அழுத்தவும் — அதன் பதிவுகள் திறக்கும், பதிவிறக்கவும் முடியும்.',
+                    'ఏ నంబర్‌నైనా నొక్కండి — దాని ఎంట్రీలు తెరుచుకుంటాయి, డౌన్‌లోడ్ కూడా చేయవచ్చు.', 'कोणत्याही नंबरवर टॅप करा — त्याच्या एंट्री उघडतील आणि डाउनलोडही करता येईल.', 'যেকোনো নম্বরে চাপুন — তার এন্ট্রি খুলবে, ডাউনলোডও করা যাবে।'],
+    onlyYours:     ['सिर्फ़ आपकी एंट्री ({e})', 'Only your entries ({e})', 'ನಿಮ್ಮ ಎಂಟ್ರಿಗಳು ಮಾತ್ರ ({e})', 'உங்கள் பதிவுகள் மட்டும் ({e})',
+                    'మీ ఎంట్రీలు మాత్రమే ({e})', 'फक्त तुमच्या एंट्री ({e})', 'শুধু আপনার এন্ট্রি ({e})'],
+    allPasters:    ['सभी पेस्टर', 'All pasters', 'ಎಲ್ಲಾ ಪೇಸ್ಟರ್‌ಗಳು', 'அனைத்து பேஸ்டர்களும்', 'అన్ని పేస్టర్లు', 'सर्व पेस्टर', 'সব পেস্টার'],
+    updated:       ['अपडेट {t}', 'Updated {t}', 'ನವೀಕರಿಸಲಾಗಿದೆ {t}', 'புதுப்பிக்கப்பட்டது {t}', 'అప్‌డేట్ {t}', 'अपडेट {t}', 'আপডেট {t}'],
+    reportFail:    ['रिपोर्ट लोड नहीं हो सकी: ', 'Could not load the report: ', 'ವರದಿ ಲೋಡ್ ಆಗಲಿಲ್ಲ: ', 'அறிக்கையை ஏற்ற முடியவில்லை: ',
+                    'రిపోర్ట్ లోడ్ కాలేదు: ', 'रिपोर्ट लोड झाला नाही: ', 'রিপোর্ট লোড হয়নি: '],
+    filterTitle:   ['फ़िल्टर / खोजें', 'Filter / search', 'ಫಿಲ್ಟರ್ / ಹುಡುಕಿ', 'வடிகட்டு / தேடு', 'ఫిల్టర్ / వెతకండి', 'फिल्टर / शोधा', 'ফিল্টার / খুঁজুন'],
+    from:          ['से', 'From', 'ಇಂದ', 'இருந்து', 'నుండి', 'पासून', 'থেকে'],
+    to:            ['तक', 'To', 'ವರೆಗೆ', 'வரை', 'వరకు', 'पर्यंत', 'পর্যন্ত'],
+    all:           ['सभी', 'All', 'ಎಲ್ಲಾ', 'அனைத்தும்', 'అన్నీ', 'सर्व', 'সব'],
+    searchLabel:   ['गाड़ी / शहर / पिनकोड', 'Vehicle / city / pincode', 'ವಾಹನ / ನಗರ / ಪಿನ್‌ಕೋಡ್', 'வாகனம் / நகரம் / பின்கோடு',
+                    'వాహనం / నగరం / పిన్‌కోడ్', 'गाडी / शहर / पिनकोड', 'গাড়ি / শহর / পিনকোড'],
+    showData:      ['डेटा देखें', 'Show data', 'ಡೇಟಾ ನೋಡಿ', 'தரவைக் காட்டு', 'డేటా చూపించు', 'डेटा पहा', 'ডেটা দেখুন'],
+    download:      ['डाउनलोड (CSV)', 'Download CSV', 'ಡೌನ್‌ಲೋಡ್ (CSV)', 'பதிவிறக்கு (CSV)', 'డౌన్‌లోడ్ (CSV)', 'डाउनलोड (CSV)', 'ডাউনলোড (CSV)'],
+    colTime:       ['समय', 'Time', 'ಸಮಯ', 'நேரம்', 'సమయం', 'वेळ', 'সময়'],
+    colVehicle:    ['गाड़ी', 'Vehicle', 'ವಾಹನ', 'வாகனம்', 'వాహనం', 'गाडी', 'গাড়ি'],
+    colSticker:    ['स्टिकर', 'Sticker', 'ಸ್ಟಿಕ್ಕರ್', 'ஸ்டிக்கர்', 'స్టిక్కర్', 'स्टिकर', 'স্টিকার'],
+    colLocation:   ['लोकेशन', 'Location', 'ಸ್ಥಳ', 'இருப்பிடம்', 'లొకేషన్', 'लोकेशन', 'লোকেশন'],
+    colPhoto:      ['फ़ोटो', 'Photo', 'ಫೋಟೋ', 'புகைப்படம்', 'ఫోటో', 'फोटो', 'ছবি'],
+    colVideo:      ['वीडियो', 'Video', 'ವೀಡಿಯೊ', 'வீடியோ', 'వీడియో', 'व्हिडिओ', 'ভিডিও'],
+    colDup:        ['डुप्लिकेट', 'Duplicate', 'ನಕಲು', 'நகல்', 'డూప్లికేట్', 'डुप्लिकेट', 'ডুপ্লিকেট'],
+    yes:           ['हाँ', 'Yes', 'ಹೌದು', 'ஆம்', 'అవును', 'होय', 'হ্যাঁ'],
+    map:           ['मैप', 'Map', 'ನಕ್ಷೆ', 'வரைபடம்', 'మ్యాప్', 'नकाशा', 'ম্যাপ'],
+    shownOf:       ['नवीनतम {n} दिख रही हैं (कुल {t})। पूरा डेटा डाउनलोड में है।', 'Showing the latest {n} of {t}. The download has all of them.',
+                    'ಇತ್ತೀಚಿನ {n} ತೋರಿಸಲಾಗಿದೆ (ಒಟ್ಟು {t}). ಡೌನ್‌ಲೋಡ್‌ನಲ್ಲಿ ಎಲ್ಲವೂ ಇದೆ.', 'சமீபத்திய {n} காட்டப்படுகிறது (மொத்தம் {t}). பதிவிறக்கத்தில் அனைத்தும் உள்ளன.',
+                    'తాజా {n} చూపిస్తున్నాం (మొత్తం {t}). డౌన్‌లోడ్‌లో అన్నీ ఉన్నాయి.', 'नवीनतम {n} दाखवत आहोत (एकूण {t}). डाउनलोडमध्ये सर्व आहेत.', 'সর্বশেষ {n}টি দেখানো হচ্ছে (মোট {t})। ডাউনলোডে সব আছে।'],
+    totalN:        ['कुल {t} एंट्री।', '{t} entries.', 'ಒಟ್ಟು {t} ಎಂಟ್ರಿಗಳು.', 'மொத்தம் {t} பதிவுகள்.', 'మొత్తం {t} ఎంట్రీలు.', 'एकूण {t} एंट्री.', 'মোট {t}টি এন্ট্রি।'],
+    noRows:        ['कोई एंट्री नहीं मिली।', 'No entries found.', 'ಯಾವುದೇ ಎಂಟ್ರಿ ಸಿಗಲಿಲ್ಲ.', 'பதிவுகள் எதுவும் இல்லை.', 'ఎంట్రీలు ఏవీ లేవు.', 'एकही एंट्री सापडली नाही.', 'কোনো এন্ট্রি পাওয়া যায়নি।'],
+    dataFail:      ['डेटा लोड नहीं हो सका: ', 'Could not load data: ', 'ಡೇಟಾ ಲೋಡ್ ಆಗಲಿಲ್ಲ: ', 'தரவை ஏற்ற முடியவில்லை: ', 'డేటా లోడ్ కాలేదు: ', 'डेटा लोड झाला नाही: ', 'ডেটা লোড হয়নি: '],
+    fromStart:     ['शुरू से', 'start', 'ಆರಂಭದಿಂದ', 'தொடக்கம்', 'మొదటి నుండి', 'सुरुवातीपासून', 'শুরু থেকে'],
+    tillToday:     ['आज तक', 'today', 'ಇಂದಿನವರೆಗೆ', 'இன்று வரை', 'ఈరోజు వరకు', 'आजपर्यंत', 'আজ পর্যন্ত']
+  };
+
+  var LANG_KEY = 'tb_lang';
+  var lang = 'hi';
+  function li() { for (var i = 0; i < LANGS.length; i++) if (LANGS[i][0] === lang) return i; return 0; }
+  function t(key, vars) {
+    var row = STR[key];
+    var s = row ? (row[li()] !== undefined ? row[li()] : row[0]) : key;
+    if (vars) Object.keys(vars).forEach(function (k) { s = s.split('{' + k + '}').join(String(vars[k])); });
+    return s;
+  }
+
+  var PHOTO_MAX_SIDE = 1280;   // smaller photos = half the Drive space, still clear for number plates
+  var PHOTO_QUALITY = 0.82;
+  var VIDEO_MAX_SECONDS = 20;
+  var VIDEO_MAX_BYTES = 15 * 1024 * 1024;
+  var MAX_FILE_AGE_MS = 3 * 60 * 1000;   // photo/video must be taken in the last 3 minutes
+  var DUPLICATE_HOURS = 24;              // same as DUPLICATE_WINDOW_HOURS in Code.gs
+
+  var VEHICLE_MAX_LEN = 20;   // mandatory, but no format rule (new trucks use temporary numbers)
+
+  var state = { photoData: '', videoData: '', busy: false, photoLoc: null, photoFile: null };
+  var link = { kind: 'p', code: '', vendor: '', email: '', locationRequired: true };
+  var report = { data: null, group: 'day' };
+  var LOCATION_MAX_AGE_MS = 2 * 60 * 1000;   // reuse a GPS fix for up to 2 minutes
+  var loc = null;          // { lat, lng, acc, time, city, state, pincode }
+  var locView = { kind: '', key: 'locGetting', text: '' };   // what the location line shows
+  var lastLocErr = null;
+  var geoCache = {};
+
+  var el = function (id) { return document.getElementById(id); };
+
+  /* ───── Talking to the Apps Script (config.js sets TB_API_URL) ───── */
+  var API_URL = window.TB_API_URL || '';
+  function api(action, payload) {
+    if (!API_URL) return Promise.reject(Object.assign(new Error('API link missing in config.js'), { server: true }));
+    return fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },   // plain text = no extra permission request
+      body: JSON.stringify(Object.assign({ action: action }, payload || {})),
+      redirect: 'follow'
+    }).then(function (r) { return r.json(); }).then(function (j) {
+      if (!j || !j.ok) throw Object.assign(new Error((j && j.error) || 'Server error'), { server: true });
+      return j.data;
+    });
+    // A network failure (no internet) rejects WITHOUT err.server, so callers can tell the two apart
+  }
+  function store(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+  function recall(key) { try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { return null; } }
+
+  /* ───── Language ───── */
+  function pickLang() {
+    var saved = '';
+    try { saved = localStorage.getItem(LANG_KEY) || ''; } catch (e) {}
+    var codes = LANGS.map(function (l) { return l[0]; });
+    if (codes.indexOf(saved) !== -1) return saved;
+    // First visit: Hindi, unless the phone is set to one of the regional languages
+    var nav = String((navigator.language || 'hi')).slice(0, 2).toLowerCase();
+    return ['kn', 'ta', 'te', 'mr', 'bn'].indexOf(nav) !== -1 ? nav : 'hi';
+  }
+
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach(function (n) { n.textContent = t(n.getAttribute('data-i18n')); });
+    document.querySelectorAll('[data-i18n-aria]').forEach(function (n) { n.setAttribute('aria-label', t(n.getAttribute('data-i18n-aria'))); });
+    el('langSel').setAttribute('aria-label', t('language'));
+    if (link.kind === 'v') {
+      el('brandTag').textContent = t('vendorTag');
+      el('repTitle').textContent = t('vendorTag') + ' — ' + (link.vendor || '');
+    }
+    setLocLine(locView.kind, locView.key, locView.text);
+    el('vehicle').dispatchEvent(new Event('input'));
+    if (state.busy) el('submitBtn').textContent = t('submitting');
+    if (report.data) { renderReport(); fillFilters(report.data); setRepSub(report.data); }
+    if (lastLocErr !== null) el('locModalReason').textContent = locationErrorText(lastLocErr);
+  }
+
+  (function initLang() {
+    var sel = el('langSel');
+    LANGS.forEach(function (l) {
+      var o = document.createElement('option');
+      o.value = l[0]; o.textContent = l[1];
+      sel.appendChild(o);
+    });
+    lang = pickLang();
+    sel.value = lang;
+    sel.addEventListener('change', function () {
+      lang = sel.value;
+      try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+      applyLang();
+    });
+    applyLang();
+  })();
+
+  /* ───── Pop-ups ───── */
+  var lastFocus = null;
+  function openModal(id) {
+    lastFocus = document.activeElement;
+    el(id).hidden = false;
+    document.body.classList.add('modal-open');
+    var x = el(id).querySelector('.modal-x');
+    if (x) x.focus();
+  }
+  function closeModal(id) {
+    el(id).hidden = true;
+    if (el('locModal').hidden && el('dataModal').hidden) document.body.classList.remove('modal-open');
+    if (id === 'dataModal') document.querySelectorAll('.num.sel').forEach(function (x) { x.classList.remove('sel'); });
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  document.querySelectorAll('[data-close]').forEach(function (b) {
+    b.addEventListener('click', function () { closeModal(b.getAttribute('data-close')); });
+  });
+  ['locModal', 'dataModal'].forEach(function (id) {
+    el(id).addEventListener('click', function (e) { if (e.target === el(id)) closeModal(id); });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (!el('dataModal').hidden) closeModal('dataModal');
+    else if (!el('locModal').hidden) closeModal('locModal');
+  });
+
+  /* ───── Views ───── */
+  function showView(name) {
+    el('bootView').hidden = name !== 'boot';
+    el('linkView').hidden = name !== 'link';
+    el('appView').hidden = !(name === 'form' || name === 'done' || name === 'report');
+    el('formView').hidden = name !== 'form';
+    el('doneView').classList.toggle('show', name === 'done');
+    window.scrollTo(0, 0);
+  }
+
+  /* Phone: switch between form and report */
+  function showPane(p) {
+    var app = el('appView');
+    app.classList.toggle('tab-form', p === 'form');
+    app.classList.toggle('tab-report', p === 'report');
+    document.querySelectorAll('.pane-tab').forEach(function (b) {
+      b.setAttribute('aria-selected', b.getAttribute('data-pane') === p ? 'true' : 'false');
+    });
+    if (p === 'report' && !report.data) loadReport();
+  }
+  document.querySelectorAll('.pane-tab').forEach(function (b) {
+    b.addEventListener('click', function () { showPane(b.getAttribute('data-pane')); });
+  });
+
+  function cleanError(err) {
+    var msg = (err && err.message) ? err.message : String(err || '');
+    return msg.replace(/^(Error|Exception):\s*/, '');
+  }
+
+  function showLinkError(extra) {
+    el('linkNotice').textContent = t('linkInvalid') + (extra || '');
+    showView('link');
+  }
+
+  /* ───── Start: ?p= (paster: form + report) or ?v= (vendor: report) ─────
+     Opens straight from the phone's saved copy; the server check runs alongside. */
+  var started = false;
+  function boot() {
+    var prm = new URLSearchParams(location.search);
+    var kind = prm.get('p') ? 'p' : (prm.get('v') ? 'v' : '');
+    var code = prm.get('p') || prm.get('v') || '';
+    if (!kind) {                                   // opened from the home-screen icon
+      var last = recall('tb_last');
+      if (last && last.kind && last.code) { kind = last.kind; code = last.code; }
+    }
+    if (!kind) return showLinkError('');
+
+    var key = 'tb_portal_' + kind + '_' + code;
+    var cached = recall(key);
+    if (cached) startPortal(cached, code);
+
+    api('portal', { kind: kind, code: code }).then(function (res) {
+      store(key, res);
+      store('tb_last', { kind: kind, code: code });
+      if (!started) startPortal(res, code);
+      else if (res.kind === 'p') { el('whoVendor').textContent = res.vendor || '—'; el('whoEmail').textContent = res.email; link.vendor = res.vendor; }
+    }, function (err) {
+      if (err.server) { try { localStorage.removeItem(key); } catch (e) {} return showLinkError(''); }
+      if (!started) showLinkError(' ' + t('firstOnline'));
+    });
+  }
+
+  function startPortal(res, code) {
+    started = true;
+    link.kind = res.kind;
+    link.code = code;
+    link.vendor = res.vendor;
+    link.email = res.email || '';
+    var app = el('appView');
+    el('main').classList.add('wide');
+
+    if (res.kind === 'v') {
+      // Vendor: report only
+      app.className = 'vendor-mode';
+      el('brandTag').textContent = t('vendorTag');
+      el('repTitle').textContent = t('vendorTag') + ' — ' + (res.vendor || '');
+      document.title = 'Vendor Report — ' + (res.vendor || '');
+      showView('report');
+      loadReport();
+      return;
+    }
+
+    // Paster: form + own report
+    link.locationRequired = res.locationRequired !== false;
+    app.className = 'paster-mode';
+    el('whoVendor').textContent = res.vendor || '—';
+    el('whoEmail').textContent = res.email;
+    showView('form');
+    showPane('form');
+    refreshLocation().catch(function () {});
+    if (window.matchMedia('(min-width: 1000px)').matches) loadReport();
+    updatePending();
+    flushQueue();
+  }
+
+  /* ───── Vehicle number ───── */
+  function normaliseVehicle(v) {
+    return String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, VEHICLE_MAX_LEN);
+  }
+
+  el('vehicle').addEventListener('input', function (e) {
+    var clean = normaliseVehicle(e.target.value);
+    if (e.target.value !== clean) e.target.value = clean;
+    var hint = el('vehicleHint');
+    hint.className = 'hint';
+    hint.textContent = t('vehicleExample');
+    if (clean) setInvalid('vehicle', false);
+  });
+
+  document.querySelectorAll('input[name="stickerType"]').forEach(function (r) {
+    r.addEventListener('change', function () { setInvalid('sticker', false); });
+  });
+
+  /* ───── Required-field checks ───── */
+  function setInvalid(field, on) {
+    if (field === 'sticker') {
+      el('stickerField').classList.toggle('invalid', on);
+      el('stickerErr').classList.toggle('show', on);
+    } else if (field === 'vehicle') {
+      el('plateBox').classList.toggle('invalid', on);
+    } else if (field === 'photo') {
+      el('photoOpen').classList.toggle('invalid', on);
+      el('photoErr').classList.toggle('show', on);
+    }
+  }
+
+  function validateRequired() {
+    var picked = document.querySelector('input[name="stickerType"]:checked');
+    var vehicle = normaliseVehicle(el('vehicle').value);
+    var missing = [];
+    var first = null;
+
+    var stickerOk = !!picked;
+    setInvalid('sticker', !stickerOk);
+    if (!stickerOk) { missing.push(t('stickerType')); first = first || el('stickerField'); }
+
+    var vehicleOk = vehicle.length > 0;
+    setInvalid('vehicle', !vehicleOk);
+    if (!vehicleOk) {
+      missing.push(t('vehicleNumber'));
+      first = first || el('plateBox');
+      var hint = el('vehicleHint');
+      hint.className = 'hint bad';
+      hint.textContent = t('vehicleEnter');
+    }
+
+    var photoOk = !!state.photoData;
+    setInvalid('photo', !photoOk);
+    if (!photoOk) { missing.push(t('truckPhoto')); first = first || el('photoOpen'); }
+
+    if (missing.length) {
+      showStatus('err', t('fillRequired') + missing.join(', '));
+      if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return null;
+    }
+    return { stickerType: picked.value, vehicle: vehicle };
+  }
+
+  /* ───── Location (lat/long + city, state, pincode) ───── */
+  // kind: '' | 'ok' | 'bad'; key: a text key, or text: ready-made text
+  function setLocLine(kind, key, text) {
+    locView = { kind: kind || '', key: key || '', text: text || '' };
+    el('locLine').className = 'loc-line' + (kind ? ' ' + kind : '');
+    el('locText').textContent = key ? (key === 'locErr' ? locationErrorText(lastLocErr) : t(key)) : text;
+  }
+
+  function locLabel(l) {
+    var place = [l.city, l.state].filter(Boolean).join(', ');
+    if (l.pincode) place += (place ? ' - ' : '') + l.pincode;
+    return (place ? place + '  |  ' : '') + l.lat.toFixed(6) + ', ' + l.lng.toFixed(6);
+  }
+
+  // err: null (no browser support) or a GeolocationPositionError
+  function locationErrorText(err) {
+    if (!navigator.geolocation || err === 'nobrowser') return t('locNoBrowser');
+    if (err && err.code === 1) return t('locDenied');
+    if (err && err.code === 3) return t('locTimeout');
+    return t('locOff');
+  }
+
+  function getPosition() {
+    return new Promise(function (resolve, reject) {
+      if (!navigator.geolocation) return reject('nobrowser');
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true, timeout: 20000, maximumAge: 60000
+      });
+    });
+  }
+
+  function getAddress(lat, lng) {
+    var key = lat.toFixed(3) + ',' + lng.toFixed(3);
+    if (geoCache[key]) return Promise.resolve(geoCache[key]);
+    if (!navigator.onLine) return Promise.resolve({});    // offline: lat/long only, city filled in later
+    var call = api('address', { code: link.code, lat: lat, lng: lng })
+      .then(function (a) { geoCache[key] = a || {}; return geoCache[key]; }, function () { return {}; });
+    var slow = new Promise(function (resolve) { setTimeout(function () { resolve({}); }, 6000); });
+    return Promise.race([call, slow]);
+  }
+
+  // Fresh GPS fix + address. Resolves with loc, rejects with the geolocation error.
+  function refreshLocation() {
+    if (loc && Date.now() - loc.time < LOCATION_MAX_AGE_MS && (loc.city || loc.state || loc.pincode)) {
+      return Promise.resolve(loc);
+    }
+    setLocLine('', 'locGetting');
+    return getPosition().then(function (pos) {
+      var l = {
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+        acc: Math.round(pos.coords.accuracy || 0),
+        time: Date.now(),
+        city: '', state: '', pincode: ''
+      };
+      return getAddress(l.lat, l.lng).then(function (a) {
+        l.city = a.city || ''; l.state = a.state || ''; l.pincode = a.pincode || '';
+        loc = l;
+        lastLocErr = null;
+        setLocLine('ok', '', locLabel(l));
+        return l;
+      });
+    }, function (err) {
+      lastLocErr = err || 'nobrowser';
+      setLocLine(link.locationRequired ? 'bad' : '', 'locErr');
+      throw lastLocErr;
+    });
+  }
+
+  function openLocModal() {
+    el('locModalReason').textContent = locationErrorText(lastLocErr);
+    openModal('locModal');
+  }
+
+  el('locRetry').addEventListener('click', function () {
+    var btn = el('locRetry');
+    btn.disabled = true;
+    btn.textContent = t('locGetting');
+    loc = null;
+    refreshLocation().then(function (l) {
+      btn.disabled = false;
+      btn.textContent = t('tryAgain');
+      closeModal('locModal');
+      if (state.photoFile) {
+        // Re-stamp the photo already taken, now with location
+        drawPhoto(state.photoFile, l, function () { showStatus('ok', t('locFound')); });
+      } else {
+        hideStatus();
+      }
+    }, function () {
+      btn.disabled = false;
+      btn.textContent = t('tryAgain');
+      el('locModalReason').textContent = locationErrorText(lastLocErr);
+    });
+  });
+
+  /* ───── Camera (phone camera app opens when the box is tapped) ───── */
+  function isFresh(file) {
+    return !file.lastModified || (Date.now() - file.lastModified) < MAX_FILE_AGE_MS;
+  }
+
+  document.querySelectorAll('.photoInput').forEach(function (inp) {
+    inp.addEventListener('click', hideStatus);
+    inp.addEventListener('change', function () {
+      var file = inp.files && inp.files[0];
+      inp.value = '';
+      if (file) handlePhoto(file);
+    });
+  });
+
+  document.querySelectorAll('.videoInput').forEach(function (inp) {
+    inp.addEventListener('click', hideStatus);
+    inp.addEventListener('change', function () {
+      var file = inp.files && inp.files[0];
+      inp.value = '';
+      if (file) handleVideo(file);
+    });
+  });
+
+  function handlePhoto(file) {
+    if (!/^image\//.test(file.type || 'image/')) return showStatus('err', t('notPhoto'));
+    if (!isFresh(file)) return showStatus('err', t('oldPhoto'));
+    showStatus('busy', t('locGetting'));
+    refreshLocation().then(function (l) {
+      drawPhoto(file, l);
+    }, function () {
+      // Keep the photo; the pop-up asks for location when the paster taps Submit
+      drawPhoto(file, null);
+    });
+  }
+
+  function drawPhoto(file, l, after) {
+    showStatus('busy', t('photoPreparing'));
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function () {
+      var w = img.naturalWidth, h = img.naturalHeight;
+      var scale = Math.min(1, PHOTO_MAX_SIDE / Math.max(w, h));
+      var canvas = document.createElement('canvas');
+      canvas.width = Math.round(w * scale);
+      canvas.height = Math.round(h * scale);
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      stampInfo(ctx, canvas.width, canvas.height, l);
+      URL.revokeObjectURL(url);
+
+      state.photoFile = file;
+      state.photoTime = file.lastModified || Date.now();
+      state.photoLoc = l;
+      state.photoData = canvas.toDataURL('image/jpeg', PHOTO_QUALITY);
+      setInvalid('photo', false);
+      el('photoPreview').src = state.photoData;
+      el('photoOpen').hidden = true;
+      el('photoDone').hidden = false;
+      hideStatus();
+      if (after) after();
+    };
+    img.onerror = function () {
+      URL.revokeObjectURL(url);
+      showStatus('err', t('photoReadFail'));
+    };
+    img.src = url;
+  }
+
+  function handleVideo(file) {
+    if (!/^video\//.test(file.type || 'video/')) return showStatus('err', t('notVideo'));
+    if (!isFresh(file)) return showStatus('err', t('oldVideo'));
+    if (file.size > VIDEO_MAX_BYTES) return showStatus('err', t('videoTooBig'));
+    var url = URL.createObjectURL(file);
+    var probe = document.createElement('video');
+    probe.preload = 'metadata';
+    probe.onloadedmetadata = function () {
+      var secs = probe.duration;
+      URL.revokeObjectURL(url);
+      if (isFinite(secs) && secs > VIDEO_MAX_SECONDS + 1) {
+        return showStatus('err', t('videoTooLong', { s: Math.round(secs), max: VIDEO_MAX_SECONDS }));
+      }
+      setVideo(file);
+    };
+    probe.onerror = function () { URL.revokeObjectURL(url); setVideo(file); };
+    probe.src = url;
+  }
+
+  function setVideo(blob) {
+    showStatus('busy', t('videoPreparing'));
+    var reader = new FileReader();
+    reader.onload = function () {
+      state.videoData = reader.result;
+      var pv = el('videoPreview');
+      if (pv.src && pv.src.indexOf('blob:') === 0) URL.revokeObjectURL(pv.src);
+      pv.src = URL.createObjectURL(blob);
+      el('videoOpen').hidden = true;
+      el('videoDone').hidden = false;
+      hideStatus();
+    };
+    reader.onerror = function () { showStatus('err', t('videoSaveFail')); };
+    reader.readAsDataURL(blob);
+  }
+
+  // Stamp date-time, lat/long and city/state/pincode on the photo (bottom-left)
+  function stampInfo(ctx, w, h, l) {
+    var d = new Date();
+    var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+    var lines = [
+      pad(d.getDate()) + '-' + pad(d.getMonth() + 1) + '-' + d.getFullYear() +
+        '  ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds())
+    ];
+    if (l) {
+      lines.push('Lat ' + l.lat.toFixed(6) + '  Long ' + l.lng.toFixed(6));
+      var place = [l.city, l.state].filter(Boolean).join(', ');
+      if (l.pincode) place += (place ? ' - ' : '') + l.pincode;
+      if (place) lines.push(place);
+    }
+
+    var size = Math.max(14, Math.round(Math.min(w, h) * 0.036));
+    var lineH = Math.round(size * 1.35);
+    ctx.font = '600 ' + size + 'px sans-serif';
+    var tw = 0;
+    lines.forEach(function (s) { tw = Math.max(tw, ctx.measureText(s).width); });
+    tw = Math.min(tw, w - size * 1.2);
+
+    var padX = Math.round(size * 0.5), padY = Math.round(size * 0.4);
+    var boxH = lines.length * lineH + padY * 2;
+    var x = Math.round(size * 0.5), y = h - boxH - Math.round(size * 0.5);
+
+    ctx.fillStyle = 'rgba(0,0,0,0.62)';
+    ctx.fillRect(x, y, tw + padX * 2, boxH);
+    ctx.fillStyle = '#ffffff';
+    ctx.textBaseline = 'top';
+    lines.forEach(function (s, k) {
+      ctx.fillText(s, x + padX, y + padY + k * lineH + Math.round((lineH - size) / 2), tw);
+    });
+  }
+
+  el('videoRemove').addEventListener('click', clearVideo);
+
+  function clearVideo() {
+    state.videoData = '';
+    var pv = el('videoPreview');
+    if (pv.src && pv.src.indexOf('blob:') === 0) URL.revokeObjectURL(pv.src);
+    pv.removeAttribute('src');
+    pv.load();
+    el('videoDone').hidden = true;
+    el('videoOpen').hidden = false;
+  }
+
+  function clearPhoto() {
+    state.photoData = '';
+    state.photoLoc = null;
+    state.photoFile = null;
+    el('photoPreview').removeAttribute('src');
+    el('photoDone').hidden = true;
+    el('photoOpen').hidden = false;
+  }
+
+  /* ───── Submit ───── */
+  el('submitBtn').addEventListener('click', function () {
+    if (state.busy) return;
+
+    var ok = validateRequired();
+    if (!ok) return;
+    var vehicle = ok.vehicle;
+
+    // Location is off → pop-up, nothing is sent
+    if (link.locationRequired && !state.photoLoc) {
+      hideStatus();
+      openLocModal();
+      return;
+    }
+
+    var entry = {
+      entryId: newId(),
+      capturedAt: state.photoTime || Date.now(),
+      accessCode: link.code,
+      stickerType: ok.stickerType,
+      vehicleNumber: vehicle,
+      photoData: state.photoData,
+      videoData: state.videoData,
+      location: state.photoLoc ? {
+        lat: state.photoLoc.lat, lng: state.photoLoc.lng, acc: state.photoLoc.acc,
+        city: state.photoLoc.city, state: state.photoLoc.state, pincode: state.photoLoc.pincode
+      } : null
+    };
+
+    // No network → keep it on the phone, send later
+    if (!navigator.onLine) return saveOffline(entry, vehicle);
+
+    setBusy(true);
+    showStatus('busy', state.videoData ? t('uploadingBoth') : t('uploadingPhoto'));
+
+    api('submit', { data: entry }).then(function (res) {
+      setBusy(false);
+      hideStatus();
+      showDone(vehicle, (res && res.vendor) || link.vendor,
+        t('savedOk') + (res && res.duplicate ? ' ' + t('duplicateNote', { h: DUPLICATE_HOURS }) : ''), false);
+      loadReport();
+    }, function (err) {
+      setBusy(false);
+      if (!err.server) return saveOffline(entry, vehicle);     // network dropped mid-way → keep it
+      var msg = cleanError(err);
+      if (msg.indexOf('LINK_INVALID') !== -1) return showLinkError(t('notSubmitted'));
+      if (msg.indexOf('लोकेशन') !== -1) { hideStatus(); return openLocModal(); }
+      showStatus('err', msg || t('submitFail'));
+    });
+  });
+
+  function showDone(vehicle, vendor, msg, offline) {
+    el('doneVehicle').textContent = vehicle;
+    el('doneVendor').textContent = t('vendorPrefix') + (vendor || '');
+    el('doneMsg').textContent = msg;
+    document.querySelector('#doneView h2').textContent = offline ? t('offlineTitle') : t('doneTitle');
+    showView('done');
+  }
+
+  /* ───── Offline: entries wait on the phone (IndexedDB) and are sent when the network is back ───── */
+  function newId() {
+    try { if (crypto.randomUUID) return crypto.randomUUID().replace(/-/g, ''); } catch (e) {}
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
+  }
+
+  var DB_NAME = 'tb_app', DB_STORE = 'queue';
+  function db() {
+    return new Promise(function (resolve, reject) {
+      var r = indexedDB.open(DB_NAME, 1);
+      r.onupgradeneeded = function () { r.result.createObjectStore(DB_STORE, { keyPath: 'entryId' }); };
+      r.onsuccess = function () { resolve(r.result); };
+      r.onerror = function () { reject(r.error); };
+    });
+  }
+  function dbDo(mode, fn) {
+    return db().then(function (d) {
+      return new Promise(function (resolve, reject) {
+        var tx = d.transaction(DB_STORE, mode);
+        var out = fn(tx.objectStore(DB_STORE));
+        tx.oncomplete = function () { resolve(out && out.result !== undefined ? out.result : out); };
+        tx.onerror = function () { reject(tx.error); };
+      });
+    });
+  }
+  function qAll() { return dbDo('readonly', function (st) { return st.getAll(); }); }
+  function qPut(item) { return dbDo('readwrite', function (st) { st.put(item); }); }
+  function qDel(id) { return dbDo('readwrite', function (st) { st.delete(id); }); }
+
+  function saveOffline(entry, vehicle) {
+    var hadVideo = !!entry.videoData;
+    entry.videoData = '';                         // videos are too big to keep on the phone
+    hideStatus();
+    qPut(entry).then(function () {
+      showDone(vehicle, link.vendor, t('savedOffline') + (hadVideo ? ' ' + t('offlineNoVideo') : ''), true);
+      updatePending();
+    }, function () {
+      showStatus('err', t('submitFail'));
+    });
+  }
+
+  var flushing = false, rejected = [];
+  function updatePending(sending) {
+    qAll().then(function (items) {
+      var bar = el('pendingBar');
+      var n = items.length;
+      if (!n && !rejected.length) { bar.hidden = true; return; }
+      bar.hidden = false;
+      bar.classList.remove('ok');
+      if (n) {
+        el('pendingText').textContent = sending ? t('sendingN', { n: n }) : t('pendingN', { n: n });
+        el('pendingHint').textContent = t('dontClear');
+        el('pendingSend').hidden = !!sending;
+      } else {
+        el('pendingText').textContent = t('rejectedN', { n: rejected.length, r: rejected[0] });
+        el('pendingHint').textContent = '';
+        el('pendingSend').hidden = true;
+      }
+    }).catch(function () {});
+  }
+
+  function flushQueue() {
+    if (flushing || !navigator.onLine || link.kind !== 'p') return;
+    flushing = true;
+    qAll().then(function (items) {
+      items.sort(function (a, b) { return (a.capturedAt || 0) - (b.capturedAt || 0); });
+      var sent = 0;
+      var next = function () {
+        if (!items.length) {
+          flushing = false;
+          updatePending();
+          if (sent) {
+            if (!rejected.length) {
+              var bar = el('pendingBar');
+              bar.hidden = false; bar.classList.add('ok');
+              el('pendingText').textContent = t('allSent'); el('pendingHint').textContent = ''; el('pendingSend').hidden = true;
+              setTimeout(function () { updatePending(); }, 4000);
+            }
+            loadReport();
+          }
+          return;
+        }
+        var item = items.shift();
+        updatePending(true);
+        api('submit', { data: item }).then(function () {
+          sent++;
+          return qDel(item.entryId).then(next);
+        }, function (err) {
+          if (!err.server) { flushing = false; updatePending(); return; }     // still offline: try later
+          var msg = cleanError(err);
+          if (msg.indexOf('LINK_INVALID') !== -1) { flushing = false; return showLinkError(t('notSubmitted')); }
+          rejected.push(msg);                                               // the server refused this one: drop it
+          return qDel(item.entryId).then(next);
+        });
+      };
+      next();
+    }).catch(function () { flushing = false; });
+  }
+
+  el('pendingSend').addEventListener('click', flushQueue);
+  window.addEventListener('online', function () { setTimeout(flushQueue, 1500); });
+  setInterval(flushQueue, 60000);
+
+  el('againBtn').addEventListener('click', function () { resetForm(); });
+
+  function resetForm() {
+    document.querySelectorAll('input[name="stickerType"]').forEach(function (r) { r.checked = false; });
+    el('vehicle').value = '';
+    el('vehicle').dispatchEvent(new Event('input'));
+    clearPhoto();
+    clearVideo();
+    setInvalid('sticker', false);
+    setInvalid('vehicle', false);
+    setInvalid('photo', false);
+    hideStatus();
+    showView('form');
+  }
+
+  /* ───── Report ───── */
+  function hEl(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      if (k === 'text') n.textContent = attrs[k];
+      else if (k === 'class') n.className = attrs[k];
+      else n.setAttribute(k, attrs[k]);
+    });
+    (kids || []).forEach(function (c) { if (c != null) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return n;
+  }
+
+  function setRepSub(res) {
+    el('repSub').textContent = (res.kind === 'v' ? t('allPasters') : t('onlyYours', { e: res.email })) +
+      ' · ' + t('updated', { t: res.updated });
+  }
+
+  function loadReport() {
+    var key = 'tb_report_' + link.kind + '_' + link.code;
+    if (!report.data) {
+      var saved = recall(key);
+      if (saved) { report.data = saved; renderReport(); fillFilters(saved); }
+    }
+    el('repSub').textContent = t('loading');
+    api('report', { kind: link.kind, code: link.code }).then(function (res) {
+      report.data = res;
+      store(key, res);
+      setRepSub(res);
+      renderReport();
+      fillFilters(res);
+    }, function (err) {
+      var msg = cleanError(err);
+      if (err.server && msg.indexOf('LINK_INVALID') !== -1) return showLinkError('');
+      if (!err.server && report.data) {
+        el('repSub').textContent = t('offlineReport') + ' · ' + t('updated', { t: report.data.updated });
+        return;
+      }
+      el('repSub').textContent = err.server ? t('reportFail') + msg : t('offlineData');
+    });
+  }
+
+  el('repRefresh').addEventListener('click', loadReport);
+
+  document.querySelectorAll('.seg button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      report.group = b.getAttribute('data-g');
+      document.querySelectorAll('.seg button').forEach(function (x) {
+        x.setAttribute('aria-selected', x === b ? 'true' : 'false');
+      });
+      renderReport();
+    });
+  });
+
+  function periodLabel(p) { return p.label === 'Today' ? t('today') : p.label; }
+
+  function renderReport() {
+    var d = report.data;
+    if (!d) return;
+    var g = report.group;
+    var periods = d.periods[g];
+    var c = d.counts[g];
+    var table = el('repTable');
+    table.innerHTML = '';
+
+    var headRow = hEl('tr', {}, [hEl('th', { text: '' })]);
+    periods.forEach(function (p) {
+      headRow.appendChild(hEl('th', {}, [periodLabel(p), hEl('small', { text: p.sub })]));
+    });
+    table.appendChild(hEl('thead', {}, [headRow]));
+
+    var body = hEl('tbody');
+    var addRow = function (label, nums, filter, cls) {
+      var tr = hEl('tr', cls ? { class: cls } : {}, [hEl('td', { text: label })]);
+      nums.forEach(function (n, i) {
+        var td = hEl('td');
+        if (n > 0) {
+          var btn = hEl('button', { class: 'num', type: 'button', text: String(n) });
+          btn.addEventListener('click', function () {
+            document.querySelectorAll('.num.sel').forEach(function (x) { x.classList.remove('sel'); });
+            btn.classList.add('sel');
+            openDetail({
+              from: periods[i].from, to: periods[i].to,
+              sticker: filter.sticker || '', paster: filter.paster || '',
+              title: periodLabel(periods[i]) + ' (' + periods[i].sub + ') · ' + label + ' · ' + n
+            });
+          });
+          td.appendChild(btn);
+        } else {
+          td.appendChild(hEl('span', { class: 'zero', text: '0' }));
+        }
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    };
+
+    addRow(t('totalEntries'), c.total, {}, 'total');
+    d.types.forEach(function (s) { addRow(t('stickerPrefix') + s, c.byType[s], { sticker: s }); });
+
+    if (d.kind === 'v' && d.pasters.length) {
+      body.appendChild(hEl('tr', { class: 'group' }, [hEl('td', { colspan: String(periods.length + 1), text: t('pasterWise') })]));
+      d.pasters.forEach(function (e) { addRow(e, c.byPaster[e], { paster: e }); });
+    }
+
+    table.appendChild(body);
+  }
+
+  /* Pop-up with the entries behind a number / filter, plus download */
+  function openDetail(q) {
+    el('detTitle').textContent = q.title;
+    el('detNote').textContent = t('loading');
+    el('detTable').innerHTML = '';
+    var dl = el('detDownload');
+    dl.removeAttribute('href');
+    dl.setAttribute('aria-disabled', 'true');
+    openModal('dataModal');
+
+    api('rows', { kind: link.kind, code: link.code, q: { from: q.from, to: q.to, sticker: q.sticker, paster: q.paster, q: q.q || '' } })
+      .then(function (res) {
+        var tbl = el('detTable');
+        tbl.innerHTML = '';
+        var cols = [t('colTime'), t('colVehicle'), t('colSticker')];
+        if (link.kind === 'v') cols.push(t('pasterLabel'));
+        cols = cols.concat([t('colLocation'), t('colPhoto'), t('colVideo'), t('colDup')]);
+        tbl.appendChild(hEl('thead', {}, [hEl('tr', {}, cols.map(function (x) { return hEl('th', { text: x }); }))]));
+
+        var body = hEl('tbody');
+        if (!res.rows.length) {
+          body.appendChild(hEl('tr', {}, [hEl('td', { colspan: String(cols.length), text: t('noRows') })]));
+        }
+        res.rows.forEach(function (r) {
+          var place = [r.city, r.state].filter(Boolean).join(', ');
+          if (r.pincode) place += (place ? ' - ' : '') + r.pincode;
+          var locKids = [place || '—'];
+          if (r.map) { locKids.push(' '); locKids.push(hEl('a', { href: r.map, target: '_blank', rel: 'noopener', text: t('map') })); }
+          var cells = [
+            hEl('td', { text: r.time }),
+            hEl('td', {}, [hEl('span', { class: 'plate-chip', text: r.vehicle })]),
+            hEl('td', { text: r.sticker })
+          ];
+          if (link.kind === 'v') cells.push(hEl('td', { text: r.paster || '—' }));
+          cells.push(hEl('td', {}, locKids));
+          cells.push(hEl('td', {}, [r.photo ? hEl('a', { href: r.photo, target: '_blank', rel: 'noopener', text: t('colPhoto') }) : '—']));
+          cells.push(hEl('td', {}, [r.video ? hEl('a', { href: r.video, target: '_blank', rel: 'noopener', text: t('colVideo') }) : '—']));
+          cells.push(hEl('td', { text: r.duplicate ? t('yes') : '' }));
+          body.appendChild(hEl('tr', {}, cells));
+        });
+        tbl.appendChild(body);
+
+        if (res.csvUrl && res.total) {
+          dl.href = res.csvUrl;
+          dl.removeAttribute('aria-disabled');
+        }
+        el('detNote').textContent = res.total > res.rows.length
+          ? t('shownOf', { n: res.rows.length, t: res.total })
+          : t('totalN', { t: res.total });
+      }, function (err) {
+        el('detNote').textContent = err.server ? t('dataFail') + cleanError(err) : t('offlineData');
+      });
+  }
+
+  /* ───── Filter box ───── */
+  function ymdLocal(d) {
+    var p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  }
+
+  function fillFilters(d) {
+    if (!el('fFrom').value) {
+      var today = new Date();
+      var from = new Date(); from.setDate(today.getDate() - 6);
+      el('fFrom').value = ymdLocal(from);
+      el('fTo').value = ymdLocal(today);
+    }
+    var fill = function (id, list) {
+      var sel = el(id), keep = sel.value;
+      sel.innerHTML = '';
+      sel.appendChild(hEl('option', { value: '', text: t('all') }));
+      list.forEach(function (v) { sel.appendChild(hEl('option', { value: v, text: v })); });
+      sel.value = keep;
+    };
+    fill('fSticker', d.types || []);
+    if (d.kind === 'v') {
+      el('fPasterWrap').hidden = false;
+      fill('fPaster', d.pasters || []);
+    }
+  }
+
+  el('fShow').addEventListener('click', function () {
+    var from = el('fFrom').value, to = el('fTo').value;
+    if (from && to && from > to) { var tmp = from; from = to; to = tmp; }
+    var parts = [(from || t('fromStart')) + ' → ' + (to || t('tillToday'))];
+    if (el('fPaster').value && link.kind === 'v') parts.push(el('fPaster').value);
+    if (el('fSticker').value) parts.push(t('stickerPrefix') + el('fSticker').value);
+    if (el('fText').value.trim()) parts.push('"' + el('fText').value.trim() + '"');
+    document.querySelectorAll('.num.sel').forEach(function (x) { x.classList.remove('sel'); });
+    openDetail({
+      from: from, to: to,
+      sticker: el('fSticker').value,
+      paster: link.kind === 'v' ? el('fPaster').value : '',
+      q: el('fText').value.trim(),
+      title: t('filterTitle') + ' · ' + parts.join(' · ')
+    });
+  });
+  el('fText').addEventListener('keydown', function (e) { if (e.key === 'Enter') el('fShow').click(); });
+
+  /* ───── Helpers ───── */
+  function setBusy(on) {
+    state.busy = on;
+    var btn = el('submitBtn');
+    btn.disabled = on;
+    btn.textContent = on ? t('submitting') : t('submit');
+  }
+  function showStatus(kind, text) {
+    var s = el('status');
+    s.className = 'status show ' + kind;
+    s.textContent = text;
+  }
+  function hideStatus() {
+    var s = el('status');
+    s.className = 'status';
+    s.textContent = '';
+  }
+
+  boot();
+
+  // Keep the app on the phone so it opens without internet
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  }
+</script>
+</body>
+</html>
