@@ -1,6 +1,6 @@
 /* WheelsEye Truck Branding — keeps the app on the phone so it opens without internet.
    Change VERSION whenever index.html / config.js change, so phones pick up the new copy. */
-var VERSION = 'tb-app-v1';
+var VERSION = 'tb-app-v2';
 var SHELL = ['./', './index.html', './config.js', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', function (e) {
@@ -18,9 +18,14 @@ self.addEventListener('fetch', function (e) {
   if (req.method !== 'GET') return;                       // data calls to Apps Script go straight to the network
   var url = new URL(req.url);
 
-  // The app's own files: open from the phone at once, refresh the saved copy in the background
+  // The app's own files: open from the phone at once, refresh the saved copy in the background.
+  // Only the app page itself and its files — any other page (like admin/) goes straight to the network.
   if (url.origin === self.location.origin) {
-    var key = req.mode === 'navigate' ? './index.html' : req;
+    var scope = new URL(self.registration.scope).pathname;          // e.g. /truck-app/
+    var isAppPage = url.pathname === scope || url.pathname === scope + 'index.html';
+    var isAppFile = SHELL.some(function (f) { return f !== './' && url.pathname === scope + f.slice(2); });
+    if (!isAppPage && !isAppFile) return;
+    var key = isAppPage ? './index.html' : req;
     e.respondWith(caches.open(VERSION).then(function (c) {
       return c.match(key, { ignoreSearch: true }).then(function (hit) {
         var fresh = fetch(req).then(function (res) {
