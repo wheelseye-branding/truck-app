@@ -103,7 +103,7 @@
     /* Report */
     .rep-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
     .rep-head h2 { margin: 0; font-size: 1.25rem; color: var(--brand); }
-    .seg { display: flex; width: 100%; max-width: 440px; padding: 4px; margin: 14px 0 12px; border-radius: 999px; background: var(--brand-soft); }
+    .seg { display: flex; width: 100%; max-width: 520px; padding: 4px; margin: 14px 0 12px; border-radius: 999px; background: var(--brand-soft); }
     .seg button {
       flex: 1; min-height: 38px; padding: 4px 6px; border: 0; border-radius: 999px; background: transparent; white-space: nowrap;
       color: var(--ink); font-family: inherit; font-size: 0.92rem; font-weight: 600; cursor: pointer;
@@ -491,6 +491,7 @@
         <button type="button" role="tab" data-g="day" aria-selected="true" data-i18n="dayWise"></button>
         <button type="button" role="tab" data-g="week" aria-selected="false" data-i18n="weekWise"></button>
         <button type="button" role="tab" data-g="month" aria-selected="false" data-i18n="monthWise"></button>
+        <button type="button" role="tab" data-g="overall" aria-selected="false" data-i18n="overall"></button>
       </div>
 
       <div class="table-wrap"><table class="rep" id="repTable"><tbody><tr><td data-i18n="loading"></td></tr></tbody></table></div>
@@ -725,6 +726,7 @@
     refresh:       ['रीफ़्रेश', 'Refresh', 'ರಿಫ್ರೆಶ್', 'புதுப்பி', 'రిఫ్రెష్', 'रिफ्रेश', 'রিফ্রেশ'],
     dayWise:       ['दिन-वार', 'Day-wise', 'ದಿನವಾರು', 'நாள் வாரியாக', 'రోజువారీ', 'दिवसनिहाय', 'দিন অনুযায়ী'],
     weekWise:      ['हफ़्ता-वार', 'Week-wise', 'ವಾರವಾರು', 'வாரம் வாரியாக', 'వారంవారీ', 'आठवडानिहाय', 'সপ্তাহ অনুযায়ী'],
+    overall:       ['कुल', 'Overall', 'ಒಟ್ಟಾರೆ', 'மொத்தம்', 'మొత్తం', 'एकूण', 'সামগ্রিক'],
     monthWise:     ['महीना-वार', 'Month-wise', 'ತಿಂಗಳುವಾರು', 'மாதம் வாரியாக', 'నెలవారీ', 'महिनानिहाय', 'মাস অনুযায়ী'],
     today:         ['आज', 'Today', 'ಇಂದು', 'இன்று', 'ఈరోజు', 'आज', 'আজ'],
     totalEntries:  ['कुल एंट्री', 'Total entries', 'ಒಟ್ಟು ಎಂಟ್ರಿಗಳು', 'மொத்த பதிவுகள்', 'మొత్తం ఎంట్రీలు', 'एकूण एंट्री', 'মোট এন্ট্রি'],
@@ -776,8 +778,9 @@
     return s;
   }
 
-  var PHOTO_MAX_SIDE = 1280;   // smaller photos = half the Drive space, still clear for number plates
-  var PHOTO_QUALITY = 0.82;
+  var PHOTO_MAX_SIDE = 1920;          // full-HD width: number plate and sticker stay sharp when zoomed
+  var PHOTO_QUALITY = 0.9;            // best quality tried first
+  var PHOTO_MAX_KB = 400;             // every photo is kept at or under this size
   var VIDEO_MAX_SECONDS = 20;
   var VIDEO_MAX_BYTES = 15 * 1024 * 1024;
   var MAX_FILE_AGE_MS = 3 * 60 * 1000;   // photo/video must be taken in the last 3 minutes
@@ -1192,7 +1195,7 @@
       state.photoFile = file;
       state.photoTime = file.lastModified || Date.now();
       state.photoLoc = l;
-      state.photoData = canvas.toDataURL('image/jpeg', PHOTO_QUALITY);
+      state.photoData = encodeUnder(canvas, PHOTO_MAX_KB * 1024);
       setInvalid('photo', false);
       el('photoPreview').src = state.photoData;
       el('photoOpen').hidden = true;
@@ -1205,6 +1208,30 @@
       showStatus('err', t('photoReadFail'));
     };
     img.src = url;
+  }
+
+  /* Best-looking JPEG that fits the size limit: lower the quality step by step, and only if
+     that is not enough, make the picture a little smaller (1920 → 1600 → 1280 px) */
+  function encodeUnder(canvas, maxBytes) {
+    var bytes = function (url) { return Math.round((url.length - url.indexOf(',') - 1) * 3 / 4); };
+    var qualities = [PHOTO_QUALITY, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6];
+    var c = canvas, url = '';
+    for (var round = 0; round < 3; round++) {
+      for (var i = 0; i < qualities.length; i++) {
+        url = c.toDataURL('image/jpeg', qualities[i]);
+        if (bytes(url) <= maxBytes) return url;
+      }
+      var side = [1600, 1280][round];
+      if (!side) break;
+      var scale = side / Math.max(c.width, c.height);
+      if (scale >= 1) continue;
+      var smaller = document.createElement('canvas');
+      smaller.width = Math.round(c.width * scale);
+      smaller.height = Math.round(c.height * scale);
+      smaller.getContext('2d').drawImage(c, 0, 0, smaller.width, smaller.height);
+      c = smaller;
+    }
+    return url;   // still the smallest we could make it
   }
 
   function handleVideo(file) {
@@ -1528,7 +1555,7 @@
     });
   });
 
-  function periodLabel(p) { return p.label === 'Today' ? t('today') : p.label; }
+  function periodLabel(p) { return p.label === 'Today' ? t('today') : (p.label === 'Overall' ? t('overall') : p.label); }
 
   function renderReport() {
     var d = report.data;
