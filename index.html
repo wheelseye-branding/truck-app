@@ -72,7 +72,7 @@
     @media (max-width: 520px) { .brand-tag { display: none; } }
 
     /* White cards on the band */
-    #formView, .done, #linkView, .report, .boot {
+    #formView, .done, #linkView, #loginView, .report, .boot {
       background: var(--paper); border-radius: 18px; padding: 22px 18px;
       box-shadow: var(--shadow);
     }
@@ -178,6 +178,17 @@
     .field-err { display: none; margin: 6px 2px 0; font-size: 0.88rem; font-weight: 600; color: var(--err); }
     .field-err.show { display: block; }
 
+    .login-card { margin-top: 12px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 8px 4px; }
+    .login-card .lwho { margin: 0; font-size: 1.02rem; line-height: 1.55; }
+    .login-card .lwho strong { color: var(--brand, #1e3a8a); word-break: break-all; }
+    #gBtn { min-height: 44px; display: flex; justify-content: center; }
+    .login-card .err { width: 100%; box-sizing: border-box; padding: 12px; border-radius: 10px; background: #fdecec; color: #b91c1c; font-weight: 600; }
+    .login-card .inapp { width: 100%; box-sizing: border-box; padding: 12px; border-radius: 10px; background: #fff8e1; border-left: 4px solid var(--plate); text-align: left; display: flex; flex-direction: column; gap: 10px; }
+    .login-card .inapp a, .login-card .inapp button { min-height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 700; text-decoration: none; font-family: inherit; font-size: 1rem; }
+    .login-card .inapp a { background: var(--brand, #1e3a8a); color: #ffffff; }
+    .login-card .inapp button { background: #ffffff; color: var(--brand, #1e3a8a); border: 1px solid #c7d2fe; }
+    .login-card .switch { background: none; border: 0; color: var(--brand2, #4f46e5); text-decoration: underline; font-family: inherit; font-size: 0.95rem; cursor: pointer; }
+    .login-card small { color: var(--muted, #4b5568); }
     .notice { margin-top: 12px; padding: 14px; border-radius: var(--radius-sm); background: #fff8e1; border-left: 4px solid var(--plate); }
     .boot { text-align: center; padding: 60px 18px; color: var(--muted); }
 
@@ -299,6 +310,20 @@
     .pending small { display: block; font-weight: 400; color: #9a3412; }
     .pending .mini { min-height: 38px; }
 
+    /* Photo viewer (opens inside the app, no Google account prompt) */
+    .pview { position: fixed; inset: 0; z-index: 80; background: rgba(2, 6, 23, 0.92); display: flex; flex-direction: column; }
+    .pview .pbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; color: #ffffff; }
+    .pview .pbar .plate-chip { font-size: 1.05rem; }
+    .pview .round { width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,0.16); color: #ffffff; font-size: 1.5rem; line-height: 1; cursor: pointer; }
+    .pview .pimg { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 6px; color: #cbd5e1; text-align: center; }
+    .pview .pimg img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; }
+    .pview .pfoot { display: flex; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)); }
+    .pview .pfoot > * { flex: 1; min-height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 700; text-decoration: none; }
+    .pview .pfoot .nav { border: 1px solid rgba(255,255,255,0.35); background: transparent; color: #ffffff; font-family: inherit; font-size: 1.2rem; cursor: pointer; }
+    .pview .pfoot .nav:disabled { opacity: 0.35; }
+    .pview .pfoot .dl { background: #ffffff; color: var(--brand); }
+    .photo-link { background: none; border: 0; padding: 0; color: var(--brand2, #4f46e5); font-family: inherit; font-size: inherit; font-weight: 600; text-decoration: underline; cursor: pointer; }
+
     /* Pop-ups */
     .modal-back {
       position: fixed; inset: 0; z-index: 50;
@@ -363,6 +388,22 @@
   <section id="linkView" hidden>
     <header><h1 data-i18n="formTitle">ट्रक ब्रांडिंग फ़ॉर्म</h1></header>
     <div class="notice" id="linkNotice" data-i18n="linkInvalid"></div>
+  </section>
+
+  <section id="loginView" hidden>
+    <header><h1 data-i18n="loginTitle"></h1></header>
+    <div class="login-card">
+      <p class="lwho" id="loginWho"></p>
+      <div id="gBtn"></div>
+      <p class="err" id="loginErr" hidden></p>
+      <div class="inapp" id="inApp" hidden>
+        <span data-i18n="loginChrome"></span>
+        <a id="openChrome" href="#" data-i18n="openChrome"></a>
+        <button type="button" id="copyLinkBtn" data-i18n="copyLink"></button>
+      </div>
+      <button type="button" class="switch" id="switchAcc" data-i18n="switchAcc" hidden></button>
+      <small data-i18n="loginNote"></small>
+    </div>
   </section>
 
   <div id="appView" hidden>
@@ -540,6 +581,21 @@
   </div>
 </div>
 
+<!-- Photo viewer -->
+<div class="pview" id="pView" hidden role="dialog" aria-modal="true" aria-label="Photo">
+  <div class="pbar">
+    <span class="plate-chip" id="pPlate"></span>
+    <span id="pCount" style="font-weight:600"></span>
+    <button type="button" class="round" id="pClose" data-i18n-aria="close">×</button>
+  </div>
+  <div class="pimg" id="pImg"></div>
+  <div class="pfoot">
+    <button type="button" class="nav" id="pPrev" aria-label="Previous">‹</button>
+    <a class="dl" id="pDl" href="#" target="_blank" rel="noopener" data-i18n="download"></a>
+    <button type="button" class="nav" id="pNext" aria-label="Next">›</button>
+  </div>
+</div>
+
 <!-- Pop-up: no internet -->
 <div class="modal-back" id="netModal" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="netModalTitle">
@@ -613,6 +669,24 @@
                     'ఆఫ్‌లైన్ — చివరిగా సేవ్ చేసిన రిపోర్ట్', 'ऑफलाइन — शेवटचा सेव्ह केलेला रिपोर्ट', 'অফলাইন — শেষ সেভ করা রিপোর্ট'],
     offlineData:   ['नेटवर्क नहीं है। डेटा देखने के लिए इंटरनेट चालू करें।', 'No network. Turn on internet to see the data.', 'ನೆಟ್‌ವರ್ಕ್ ಇಲ್ಲ. ಡೇಟಾ ನೋಡಲು ಇಂಟರ್ನೆಟ್ ಆನ್ ಮಾಡಿ.',
                     'நெட்வொர்க் இல்லை. தரவைப் பார்க்க இணையத்தை இயக்கவும்.', 'నెట్‌వర్క్ లేదు. డేటా చూడటానికి ఇంటర్నెట్ ఆన్ చేయండి.', 'नेटवर्क नाही. डेटा पाहण्यासाठी इंटरनेट चालू करा.', 'নেটওয়ার্ক নেই। ডেটা দেখতে ইন্টারনেট চালু করুন।'],
+    loginTitle:    ['Google से login करें', 'Sign in with Google', 'Google ಮೂಲಕ ಲಾಗಿನ್ ಮಾಡಿ', 'Google மூலம் உள்நுழைக', 'Google తో లాగిన్ అవ్వండి', 'Google ने लॉगिन करा', 'Google দিয়ে লগইন করুন'],
+    loginMsg:      ['यह लिंक {email} के लिए है। आगे बढ़ने के लिए इसी Google account से login करें।', 'This link is for {email}. Sign in with this same Google account to continue.',
+                    'ಈ ಲಿಂಕ್ {email} ಗಾಗಿ. ಮುಂದುವರಿಯಲು ಇದೇ Google ಖಾತೆಯಿಂದ ಲಾಗಿನ್ ಮಾಡಿ.', 'இந்த இணைப்பு {email} க்கானது. தொடர இதே Google கணக்கில் உள்நுழையவும்.',
+                    'ఈ లింక్ {email} కోసం. కొనసాగడానికి ఇదే Google ఖాతాతో లాగిన్ అవ్వండి.', 'ही लिंक {email} साठी आहे. पुढे जाण्यासाठी याच Google खात्याने लॉगिन करा.', 'এই লিঙ্কটি {email}-এর জন্য। এগোতে এই একই Google অ্যাকাউন্ট দিয়ে লগইন করুন।'],
+    loginWrong:    ['आपने किसी और account से login किया। यह लिंक सिर्फ़ {email} के लिए है — सही account चुनें।', 'You signed in with a different account. This link is only for {email} — choose the right account.',
+                    'ನೀವು ಬೇರೆ ಖಾತೆಯಿಂದ ಲಾಗಿನ್ ಮಾಡಿದ್ದೀರಿ. ಈ ಲಿಂಕ್ {email} ಗೆ ಮಾತ್ರ — ಸರಿಯಾದ ಖಾತೆ ಆಯ್ಕೆಮಾಡಿ.', 'நீங்கள் வேறு கணக்கில் உள்நுழைந்தீர்கள். இந்த இணைப்பு {email} க்கு மட்டும் — சரியான கணக்கைத் தேர்ந்தெடுக்கவும்.',
+                    'మీరు వేరే ఖాతాతో లాగిన్ అయ్యారు. ఈ లింక్ {email} కోసం మాత్రమే — సరైన ఖాతాను ఎంచుకోండి.', 'तुम्ही दुसऱ्या खात्याने लॉगिन केले. ही लिंक फक्त {email} साठी आहे — योग्य खाते निवडा.', 'আপনি অন্য অ্যাকাউন্ট দিয়ে লগইন করেছেন। এই লিঙ্ক শুধু {email}-এর জন্য — সঠিক অ্যাকাউন্ট বেছে নিন।'],
+    loginFail:     ['Login नहीं हो पाया। इंटरनेट देखें और दोबारा कोशिश करें।', 'Sign-in did not work. Check the internet and try again.', 'ಲಾಗಿನ್ ಆಗಲಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+                    'உள்நுழைவு நடக்கவில்லை. இணையத்தைச் சரிபார்த்து மீண்டும் முயலவும்.', 'లాగిన్ కాలేదు. ఇంటర్నెట్ చూసి మళ్ళీ ప్రయత్నించండి.', 'लॉगिन झाले नाही. इंटरनेट तपासा आणि पुन्हा प्रयत्न करा.', 'লগইন হয়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।'],
+    loginChrome:   ['यह लिंक WhatsApp / दूसरे ऐप के अंदर खुला है, जहाँ Google login नहीं चलता। नीचे "Chrome में खोलें" दबाएँ।', 'This link opened inside WhatsApp / another app, where Google sign-in does not work. Tap "Open in Chrome" below.',
+                    'ಈ ಲಿಂಕ್ WhatsApp / ಬೇರೆ ಆಪ್ ಒಳಗೆ ತೆರೆಯಿತು, ಅಲ್ಲಿ Google ಲಾಗಿನ್ ಕೆಲಸ ಮಾಡುವುದಿಲ್ಲ. ಕೆಳಗೆ "Chrome ನಲ್ಲಿ ತೆರೆಯಿರಿ" ಒತ್ತಿ.', 'இந்த இணைப்பு WhatsApp / வேறு ஆப்பிற்குள் திறந்துள்ளது; அங்கு Google உள்நுழைவு வேலை செய்யாது. கீழே "Chrome-இல் திற" அழுத்தவும்.',
+                    'ఈ లింక్ WhatsApp / వేరే యాప్ లోపల తెరుచుకుంది, అక్కడ Google లాగిన్ పనిచేయదు. కింద "Chrome లో తెరవండి" నొక్కండి.', 'ही लिंक WhatsApp / दुसऱ्या ॲपमध्ये उघडली आहे, तिथे Google लॉगिन चालत नाही. खाली "Chrome मध्ये उघडा" दाबा.', 'লিঙ্কটি WhatsApp / অন্য অ্যাপের ভেতরে খুলেছে, সেখানে Google লগইন কাজ করে না। নিচে "Chrome-এ খুলুন" চাপুন।'],
+    openChrome:    ['Chrome में खोलें', 'Open in Chrome', 'Chrome ನಲ್ಲಿ ತೆರೆಯಿರಿ', 'Chrome-இல் திற', 'Chrome లో తెరవండి', 'Chrome मध्ये उघडा', 'Chrome-এ খুলুন'],
+    copyLink:      ['लिंक कॉपी करें', 'Copy link', 'ಲಿಂಕ್ ಕಾಪಿ ಮಾಡಿ', 'இணைப்பை நகலெடு', 'లింక్ కాపీ చేయండి', 'लिंक कॉपी करा', 'লিঙ্ক কপি করুন'],
+    linkCopied:    ['लिंक कॉपी हो गया — Chrome में पेस्ट करें।', 'Link copied — paste it in Chrome.', 'ಲಿಂಕ್ ಕಾಪಿ ಆಯಿತು — Chrome ನಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ.', 'இணைப்பு நகலெடுக்கப்பட்டது — Chrome-இல் ஒட்டவும்.', 'లింక్ కాపీ అయింది — Chrome లో పేస్ట్ చేయండి.', 'लिंक कॉपी झाली — Chrome मध्ये पेस्ट करा.', 'লিঙ্ক কপি হয়েছে — Chrome-এ পেস্ট করুন।'],
+    loginNote:     ['फ़ोन यह login 30 दिन याद रखेगा।', 'This phone will remember the sign-in for 30 days.', 'ಈ ಫೋನ್ 30 ದಿನ ಲಾಗಿನ್ ನೆನಪಿಡುತ್ತದೆ.', 'இந்த போன் 30 நாட்கள் உள்நுழைவை நினைவில் வைக்கும்.', 'ఈ ఫోన్ 30 రోజులు లాగిన్ గుర్తుంచుకుంటుంది.', 'हा फोन 30 दिवस लॉगिन लक्षात ठेवेल.', 'এই ফোন ৩০ দিন লগইন মনে রাখবে।'],
+    switchAcc:     ['दूसरा account चुनें', 'Use another account', 'ಬೇರೆ ಖಾತೆ ಬಳಸಿ', 'வேறு கணக்கைப் பயன்படுத்து', 'వేరే ఖాతా వాడండి', 'दुसरे खाते वापरा', 'অন্য অ্যাকাউন্ট ব্যবহার করুন'],
+    loginChecking: ['Login जाँच रहे हैं…', 'Checking sign-in…', 'ಲಾಗಿನ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ…', 'உள்நுழைவு சரிபார்க்கப்படுகிறது…', 'లాగిన్ తనిఖీ చేస్తోంది…', 'लॉगिन तपासत आहोत…', 'লগইন যাচাই করা হচ্ছে…'],
     firstOnline:   ['पहली बार यह लिंक इंटरनेट चालू करके खोलें।', 'Open this link with internet the first time.', 'ಮೊದಲ ಬಾರಿ ಈ ಲಿಂಕ್ ಅನ್ನು ಇಂಟರ್ನೆಟ್ ಆನ್ ಮಾಡಿ ತೆರೆಯಿರಿ.',
                     'முதல் முறை இணையத்துடன் இந்த இணைப்பைத் திறக்கவும்.', 'మొదటిసారి ఇంటర్నెట్ ఆన్ చేసి ఈ లింక్ తెరవండి.', 'पहिल्यांदा ही लिंक इंटरनेट चालू करून उघडा.', 'প্রথমবার ইন্টারনেট চালু করে এই লিঙ্কটি খুলুন।'],
     language:      ['भाषा', 'Language', 'ಭಾಷೆ', 'மொழி', 'భాష', 'भाषा', 'ভাষা'],
@@ -716,6 +790,9 @@
     videoSaveFail: ['वीडियो सेव नहीं हो सका। कृपया दोबारा रिकॉर्ड करें।', 'Could not save the video. Please record again.', 'ವೀಡಿಯೊ ಉಳಿಸಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ರೆಕಾರ್ಡ್ ಮಾಡಿ.',
                     'வீடியோவைச் சேமிக்க முடியவில்லை. மீண்டும் பதிவு செய்யவும்.', 'వీడియో సేవ్ కాలేదు. మళ్ళీ రికార్డ్ చేయండి.', 'व्हिडिओ सेव्ह झाला नाही. पुन्हा रेकॉर्ड करा.', 'ভিডিও সেভ করা যায়নি। আবার রেকর্ড করুন।'],
     locChecking:   ['लोकेशन जाँच रहे हैं…', 'Checking location…', 'ಸ್ಥಳ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ…', 'இருப்பிடம் சரிபார்க்கப்படுகிறது…', 'లొకేషన్ తనిఖీ చేస్తోంది…', 'लोकेशन तपासत आहोत…', 'লোকেশন যাচাই করা হচ্ছে…'],
+    download:      ['डाउनलोड', 'Download', 'ಡೌನ್‌ಲೋಡ್', 'பதிவிறக்கு', 'డౌన్‌లోడ్', 'डाउनलोड', 'ডাউনলোড'],
+    photoLoading:  ['फ़ोटो खुल रही है…', 'Opening photo…', 'ಫೋಟೋ ತೆರೆಯುತ್ತಿದೆ…', 'புகைப்படம் திறக்கிறது…', 'ఫోటో తెరుస్తోంది…', 'फोटो उघडत आहे…', 'ছবি খুলছে…'],
+    photoFail:     ['फ़ोटो यहाँ नहीं दिखी — "डाउनलोड" दबाएँ।', 'The photo did not show here — tap "Download".', 'ಫೋಟೋ ಇಲ್ಲಿ ಕಾಣಲಿಲ್ಲ — "ಡೌನ್‌ಲೋಡ್" ಒತ್ತಿ.', 'புகைப்படம் இங்கே தெரியவில்லை — "பதிவிறக்கு" அழுத்தவும்.', 'ఫోటో ఇక్కడ కనిపించలేదు — "డౌన్‌లోడ్" నొక్కండి.', 'फोटो इथे दिसला नाही — "डाउनलोड" दाबा.', 'ছবি এখানে দেখা যায়নি — "ডাউনলোড" চাপুন।'],
     netTitle:      ['इंटरनेट नहीं है', 'No internet', 'ಇಂಟರ್ನೆಟ್ ಇಲ್ಲ', 'இணையம் இல்லை', 'ఇంటర్నెట్ లేదు', 'इंटरनेट नाही', 'ইন্টারনেট নেই'],
     netBody:       ['एंट्री जमा करने के लिए इंटरनेट ज़रूरी है। नेटवर्क वाली जगह पर जाकर "दोबारा कोशिश करें" दबाएँ — भरी हुई जानकारी और फ़ोटो यहीं रहेगी।',
                     'Internet is needed to submit. Move to a place with network and tap "Try again" — what you filled in and the photo stay here.',
@@ -828,12 +905,13 @@
 
   /* ───── Talking to the Apps Script (config.js sets TB_API_URL) ───── */
   var API_URL = window.TB_API_URL || '';
+  var SESSION = '';
   function api(action, payload) {
     if (!API_URL) return Promise.reject(Object.assign(new Error('API link missing in config.js'), { server: true }));
     return fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },   // plain text = no extra permission request
-      body: JSON.stringify(Object.assign({ action: action }, payload || {})),
+      body: JSON.stringify(Object.assign({ action: action, session: SESSION }, payload || {})),
       redirect: 'follow'
     }).then(function (r) { return r.json(); }).then(function (j) {
       if (!j || !j.ok) throw Object.assign(new Error((j && j.error) || 'Server error'), { server: true });
@@ -888,6 +966,58 @@
     applyLang();
   })();
 
+  /* ───── Photo viewer: Drive photo shown inside the app ───── */
+  var pv = { list: [], i: 0 };
+  function driveId(u) {
+    var m = /\/d\/([^/?#]+)/.exec(u || '') || /[?&]id=([^&#]+)/.exec(u || '');
+    return m ? m[1] : '';
+  }
+  function openPhoto(list, i) {
+    pv.list = list || pv.list;
+    pv.i = Math.max(0, Math.min(pv.list.length - 1, i));
+    var r = pv.list[pv.i];
+    var id = driveId(r.photo);
+    el('pPlate').textContent = r.vehicle || '';
+    el('pCount').textContent = (pv.i + 1) + ' / ' + pv.list.length;
+    el('pDl').href = id ? 'https://drive.google.com/uc?export=download&id=' + encodeURIComponent(id) : (r.photo || '#');
+    var box = el('pImg');
+    box.textContent = t('photoLoading');
+    if (id) {
+      var img = new Image();
+      img.alt = r.vehicle || '';
+      img.referrerPolicy = 'no-referrer';
+      img.onload = function () { box.innerHTML = ''; box.appendChild(img); };
+      img.onerror = function () { box.textContent = t('photoFail'); };
+      img.src = 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w1600';
+    } else {
+      box.textContent = t('photoFail');
+    }
+    el('pPrev').disabled = pv.i === 0;
+    el('pNext').disabled = pv.i >= pv.list.length - 1;
+    el('pView').hidden = false;
+  }
+  function closePhoto() { el('pView').hidden = true; }
+  (function () {
+    var x0 = null, y0 = null;
+    el('pView').addEventListener('touchstart', function (e) { var p = e.touches[0]; x0 = p.clientX; y0 = p.clientY; }, { passive: true });
+    el('pView').addEventListener('touchend', function (e) {
+      if (x0 === null) return;
+      var p = e.changedTouches[0], dx = p.clientX - x0, dy = p.clientY - y0;
+      x0 = null;
+      if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return;
+      openPhoto(null, pv.i + (dx < 0 ? 1 : -1));          // swipe left = next, right = previous
+    });
+    document.addEventListener('keydown', function (e) {
+      if (el('pView').hidden) return;
+      if (e.key === 'ArrowRight') openPhoto(null, pv.i + 1);
+      if (e.key === 'ArrowLeft') openPhoto(null, pv.i - 1);
+    });
+  })();
+  el('pClose').addEventListener('click', closePhoto);
+  el('pPrev').addEventListener('click', function () { openPhoto(null, pv.i - 1); });
+  el('pNext').addEventListener('click', function () { openPhoto(null, pv.i + 1); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !el('pView').hidden) { e.stopImmediatePropagation(); closePhoto(); } }, true);
+
   /* ───── Pop-ups ───── */
   var lastFocus = null;
   function openModal(id) {
@@ -919,6 +1049,7 @@
   function showView(name) {
     el('bootView').hidden = name !== 'boot';
     el('linkView').hidden = name !== 'link';
+    el('loginView').hidden = name !== 'login';
     el('appView').hidden = !(name === 'form' || name === 'done' || name === 'report');
     el('formView').hidden = name !== 'form';
     el('doneView').classList.toggle('show', name === 'done');
@@ -963,10 +1094,15 @@
     if (!kind) return showLinkError('');
 
     var key = 'tb_portal_' + kind + '_' + code;
+    SESSION = (kind === 'p' && recall('tb_sess_' + code)) || '';
     var cached = recall(key);
-    if (cached) startPortal(cached, code);
+    if (cached && !cached.needLogin) startPortal(cached, code);
 
     api('portal', { kind: kind, code: code }).then(function (res) {
+      if (res.needLogin) {
+        try { localStorage.removeItem(key); localStorage.removeItem('tb_sess_' + code); } catch (e) {}
+        return showLogin(res, code);
+      }
       store(key, res);
       store('tb_last', { kind: kind, code: code });
       if (!started) startPortal(res, code);
@@ -974,6 +1110,74 @@
     }, function (err) {
       if (err.server) { try { localStorage.removeItem(key); } catch (e) {} return showLinkError(''); }
       if (!started) showLinkError(' ' + t('firstOnline'));
+    });
+  }
+
+  /* ───── Google sign-in (only for pasters with ID check ON) ───── */
+  var IN_APP = /; wv\)|FBAN|FBAV|Instagram|WhatsApp|Line\//i.test(navigator.userAgent);
+  function loginExpired(code) {
+    try { localStorage.removeItem('tb_sess_' + code); localStorage.removeItem('tb_portal_p_' + code); } catch (e) {}
+    location.reload();
+  }
+  function showLogin(res, code) {
+    started = true;
+    el('main').classList.remove('wide');
+    el('loginWho').innerHTML = '';
+    var parts = t('loginMsg').split('{email}');
+    el('loginWho').appendChild(document.createTextNode(parts[0] || ''));
+    el('loginWho').appendChild(Object.assign(document.createElement('strong'), { textContent: res.email || '' }));
+    el('loginWho').appendChild(document.createTextNode(parts[1] || ''));
+    el('loginErr').hidden = true;
+    showView('login');
+
+    if (IN_APP) {
+      el('inApp').hidden = false;
+      el('gBtn').hidden = true;
+      var here = location.href;
+      el('openChrome').href = /android/i.test(navigator.userAgent)
+        ? 'intent://' + location.host + location.pathname + location.search + '#Intent;scheme=https;package=com.android.chrome;end'
+        : here;
+      el('copyLinkBtn').onclick = function () {
+        var done = function () { el('loginErr').hidden = false; el('loginErr').style.background = '#e7f6ec'; el('loginErr').style.color = '#15803d'; el('loginErr').textContent = t('linkCopied'); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(here).then(done, function () { window.prompt('', here); });
+        else window.prompt('', here);
+      };
+      return;
+    }
+
+    var start = function () {
+      google.accounts.id.initialize({
+        client_id: res.clientId,
+        callback: function (cred) { onGoogleCredential(cred, code, res.email); },
+        auto_select: true,
+        login_hint: res.email,
+        cancel_on_tap_outside: false
+      });
+      google.accounts.id.renderButton(el('gBtn'), { theme: 'filled_blue', size: 'large', text: 'continue_with', shape: 'pill', width: 280 });
+      google.accounts.id.prompt();
+      el('switchAcc').hidden = false;
+      el('switchAcc').onclick = function () { google.accounts.id.disableAutoSelect(); google.accounts.id.prompt(); };
+    };
+    if (window.google && google.accounts && google.accounts.id) return start();
+    var sc = document.createElement('script');
+    sc.src = 'https://accounts.google.com/gsi/client';
+    sc.async = true;
+    sc.onload = start;
+    sc.onerror = function () { el('loginErr').hidden = false; el('loginErr').textContent = t('loginFail'); };
+    document.head.appendChild(sc);
+  }
+  function onGoogleCredential(cred, code, email) {
+    el('loginErr').hidden = false;
+    el('loginErr').style.background = '#eef2ff'; el('loginErr').style.color = '#1e3a8a';
+    el('loginErr').textContent = t('loginChecking');
+    api('login', { code: code, idToken: cred && cred.credential }).then(function (r) {
+      store('tb_sess_' + code, r.session);
+      location.reload();
+    }, function (err) {
+      var msg = cleanError(err);
+      el('loginErr').style.background = ''; el('loginErr').style.color = '';
+      el('loginErr').textContent = msg.indexOf('WRONG_ACCOUNT') !== -1 ? t('loginWrong', { email: email }) : t('loginFail');
+      try { google.accounts.id.disableAutoSelect(); } catch (e) {}
     });
   }
 
@@ -1414,6 +1618,7 @@
       setBusy(false);
       if (!err.server) { hideStatus(); return openModal('netModal'); }   // network dropped mid-way
       var msg = cleanError(err);
+      if (msg.indexOf('LOGIN_REQUIRED') !== -1) return loginExpired(link.code);
       if (msg.indexOf('LINK_INVALID') !== -1) return showLinkError(t('notSubmitted'));
       if (msg.indexOf('लोकेशन') !== -1) { hideStatus(); return openLocModal(); }
       showStatus('err', msg || t('submitFail'));
@@ -1584,6 +1789,7 @@
       fillFilters(res);
     }, function (err) {
       var msg = cleanError(err);
+      if (err.server && msg.indexOf('LOGIN_REQUIRED') !== -1) return loginExpired(link.code);
       if (err.server && msg.indexOf('LINK_INVALID') !== -1) return showLinkError('');
       if (!err.server && report.data) {
         el('repSub').textContent = t('offlineReport') + ' · ' + t('updated', { t: report.data.updated });
@@ -1681,7 +1887,7 @@
         if (!res.rows.length) {
           body.appendChild(hEl('tr', {}, [hEl('td', { colspan: String(cols.length), text: t('noRows') })]));
         }
-        res.rows.forEach(function (r) {
+        res.rows.forEach(function (r, k) {
           var place = [r.city, r.state].filter(Boolean).join(', ');
           if (r.pincode) place += (place ? ' - ' : '') + r.pincode;
           var locKids = [place || '—'];
@@ -1693,7 +1899,12 @@
           ];
           if (link.kind === 'v') cells.push(hEl('td', { text: r.paster || '—' }));
           cells.push(hEl('td', {}, locKids));
-          cells.push(hEl('td', {}, [r.photo ? hEl('a', { href: r.photo, target: '_blank', rel: 'noopener', text: t('colPhoto') }) : '—']));
+          var pb = null;
+          if (r.photo) {
+            pb = hEl('button', { class: 'photo-link', type: 'button', text: t('colPhoto') });
+            pb.addEventListener('click', function () { openPhoto(res.rows, k); });
+          }
+          cells.push(hEl('td', {}, [pb || '—']));
           cells.push(hEl('td', {}, [r.video ? hEl('a', { href: r.video, target: '_blank', rel: 'noopener', text: t('colVideo') }) : '—']));
           cells.push(hEl('td', { text: r.duplicate ? t('yes') : '' }));
           body.appendChild(hEl('tr', {}, cells));
