@@ -540,6 +540,24 @@
   </div>
 </div>
 
+<!-- Pop-up: no internet -->
+<div class="modal-back" id="netModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="netModalTitle">
+    <div class="modal-head">
+      <span class="modal-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8.8a15 15 0 0 1 20 0M5 12.6a10 10 0 0 1 14 0M8.5 16.4a5 5 0 0 1 7 0"/><circle cx="12" cy="20" r="1"/><path d="M3 3l18 18"/></svg></span>
+      <h3 id="netModalTitle" data-i18n="netTitle"></h3>
+      <button type="button" class="modal-x" data-close="netModal" data-i18n-aria="close">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin:0" data-i18n="netBody"></p>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="mini" data-close="netModal" data-i18n="close"></button>
+      <button type="button" class="fbtn" id="netRetry" data-i18n="tryAgain"></button>
+    </div>
+  </div>
+</div>
+
 <!-- Pop-up: report data -->
 <div class="modal-back" id="dataModal" hidden>
   <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="detTitle">
@@ -697,6 +715,15 @@
     videoPreparing:['वीडियो तैयार हो रहा है…', 'Preparing video…', 'ವೀಡಿಯೊ ಸಿದ್ಧವಾಗುತ್ತಿದೆ…', 'வீடியோ தயாராகிறது…', 'వీడియో సిద్ధమవుతోంది…', 'व्हिडिओ तयार होत आहे…', 'ভিডিও তৈরি হচ্ছে…'],
     videoSaveFail: ['वीडियो सेव नहीं हो सका। कृपया दोबारा रिकॉर्ड करें।', 'Could not save the video. Please record again.', 'ವೀಡಿಯೊ ಉಳಿಸಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ರೆಕಾರ್ಡ್ ಮಾಡಿ.',
                     'வீடியோவைச் சேமிக்க முடியவில்லை. மீண்டும் பதிவு செய்யவும்.', 'వీడియో సేవ్ కాలేదు. మళ్ళీ రికార్డ్ చేయండి.', 'व्हिडिओ सेव्ह झाला नाही. पुन्हा रेकॉर्ड करा.', 'ভিডিও সেভ করা যায়নি। আবার রেকর্ড করুন।'],
+    locChecking:   ['लोकेशन जाँच रहे हैं…', 'Checking location…', 'ಸ್ಥಳ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ…', 'இருப்பிடம் சரிபார்க்கப்படுகிறது…', 'లొకేషన్ తనిఖీ చేస్తోంది…', 'लोकेशन तपासत आहोत…', 'লোকেশন যাচাই করা হচ্ছে…'],
+    netTitle:      ['इंटरनेट नहीं है', 'No internet', 'ಇಂಟರ್ನೆಟ್ ಇಲ್ಲ', 'இணையம் இல்லை', 'ఇంటర్నెట్ లేదు', 'इंटरनेट नाही', 'ইন্টারনেট নেই'],
+    netBody:       ['एंट्री जमा करने के लिए इंटरनेट ज़रूरी है। नेटवर्क वाली जगह पर जाकर "दोबारा कोशिश करें" दबाएँ — भरी हुई जानकारी और फ़ोटो यहीं रहेगी।',
+                    'Internet is needed to submit. Move to a place with network and tap "Try again" — what you filled in and the photo stay here.',
+                    'ಸಲ್ಲಿಸಲು ಇಂಟರ್ನೆಟ್ ಅಗತ್ಯ. ನೆಟ್‌ವರ್ಕ್ ಇರುವ ಜಾಗಕ್ಕೆ ಹೋಗಿ "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ" ಒತ್ತಿ — ನೀವು ತುಂಬಿದ ಮಾಹಿತಿ ಮತ್ತು ಫೋಟೋ ಇಲ್ಲೇ ಇರುತ್ತದೆ.',
+                    'சமர்ப்பிக்க இணையம் தேவை. நெட்வொர்க் உள்ள இடத்திற்குச் சென்று "மீண்டும் முயல்க" அழுத்தவும் — நிரப்பிய தகவலும் புகைப்படமும் இங்கேயே இருக்கும்.',
+                    'సమర్పించడానికి ఇంటర్నెట్ అవసరం. నెట్‌వర్క్ ఉన్న చోటికి వెళ్ళి "మళ్ళీ ప్రయత్నించండి" నొక్కండి — మీరు నింపిన సమాచారం, ఫోటో ఇక్కడే ఉంటాయి.',
+                    'सबमिट करण्यासाठी इंटरनेट आवश्यक आहे. नेटवर्क असलेल्या ठिकाणी जाऊन "पुन्हा प्रयत्न करा" दाबा — भरलेली माहिती आणि फोटो इथेच राहतील.',
+                    'জমা দিতে ইন্টারনেট দরকার। নেটওয়ার্ক আছে এমন জায়গায় গিয়ে "আবার চেষ্টা করুন" চাপুন — পূরণ করা তথ্য ও ছবি এখানেই থাকবে।'],
     locGetting:    ['लोकेशन ली जा रही है…', 'Getting location…', 'ಸ್ಥಳ ಪಡೆಯಲಾಗುತ್ತಿದೆ…', 'இருப்பிடம் பெறப்படுகிறது…', 'లొకేషన్ తీసుకుంటోంది…', 'लोकेशन घेतले जात आहे…', 'লোকেশন নেওয়া হচ্ছে…'],
     locNoBrowser:  ['यह ब्राउज़र लोकेशन सपोर्ट नहीं करता। लिंक को Chrome में खोलें।', 'This browser does not support location. Open the link in Chrome.',
                     'ಈ ಬ್ರೌಸರ್ ಸ್ಥಳವನ್ನು ಬೆಂಬಲಿಸುವುದಿಲ್ಲ. ಲಿಂಕ್ ಅನ್ನು Chrome ನಲ್ಲಿ ತೆರೆಯಿರಿ.', 'இந்த உலாவி இருப்பிடத்தை ஆதரிக்காது. இணைப்பை Chrome-ல் திறக்கவும்.',
@@ -872,14 +899,14 @@
   }
   function closeModal(id) {
     el(id).hidden = true;
-    if (el('locModal').hidden && el('dataModal').hidden) document.body.classList.remove('modal-open');
+    if (el('locModal').hidden && el('dataModal').hidden && el('netModal').hidden) document.body.classList.remove('modal-open');
     if (id === 'dataModal') document.querySelectorAll('.num.sel').forEach(function (x) { x.classList.remove('sel'); });
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
   document.querySelectorAll('[data-close]').forEach(function (b) {
     b.addEventListener('click', function () { closeModal(b.getAttribute('data-close')); });
   });
-  ['locModal', 'dataModal'].forEach(function (id) {
+  ['locModal', 'dataModal', 'netModal'].forEach(function (id) {
     el(id).addEventListener('click', function (e) { if (e.target === el(id)) closeModal(id); });
   });
   document.addEventListener('keydown', function (e) {
@@ -1068,11 +1095,12 @@
     return t('locOff');
   }
 
-  function getPosition() {
+  // fresh = true → a live GPS reading right now, so a phone with Location switched off cannot pass
+  function getPosition(fresh) {
     return new Promise(function (resolve, reject) {
       if (!navigator.geolocation) return reject('nobrowser');
       navigator.geolocation.getCurrentPosition(resolve, reject, {
-        enableHighAccuracy: true, timeout: 20000, maximumAge: 60000
+        enableHighAccuracy: true, timeout: 20000, maximumAge: fresh ? 0 : 60000
       });
     });
   }
@@ -1088,12 +1116,12 @@
   }
 
   // Fresh GPS fix + address. Resolves with loc, rejects with the geolocation error.
-  function refreshLocation() {
-    if (loc && Date.now() - loc.time < LOCATION_MAX_AGE_MS && (loc.city || loc.state || loc.pincode)) {
+  function refreshLocation(fresh) {
+    if (!fresh && loc && Date.now() - loc.time < LOCATION_MAX_AGE_MS && (loc.city || loc.state || loc.pincode)) {
       return Promise.resolve(loc);
     }
     setLocLine('', 'locGetting');
-    return getPosition().then(function (pos) {
+    return getPosition(fresh).then(function (pos) {
       var l = {
         lat: pos.coords.latitude,
         lng: pos.coords.longitude,
@@ -1125,7 +1153,7 @@
     btn.disabled = true;
     btn.textContent = t('locGetting');
     loc = null;
-    refreshLocation().then(function (l) {
+    refreshLocation(true).then(function (l) {
       btn.disabled = false;
       btn.textContent = t('tryAgain');
       closeModal('locModal');
@@ -1169,7 +1197,7 @@
     if (!/^image\//.test(file.type || 'image/')) return showStatus('err', t('notPhoto'));
     if (!isFresh(file)) return showStatus('err', t('oldPhoto'));
     showStatus('busy', t('locGetting'));
-    refreshLocation().then(function (l) {
+    refreshLocation(true).then(function (l) {
       drawPhoto(file, l);
     }, function () {
       // Keep the photo; the pop-up asks for location when the paster taps Submit
@@ -1354,9 +1382,25 @@
       } : null
     };
 
-    // No network → keep it on the phone, send later
-    if (!navigator.onLine) return saveOffline(entry, vehicle);
+    // No internet → pop-up, nothing is sent or kept; the filled form stays on screen
+    if (!navigator.onLine) { hideStatus(); return openModal('netModal'); }
 
+    // Location must still be ON at the moment of submitting (live check)
+    if (link.locationRequired) {
+      setBusy(true);
+      showStatus('busy', t('locChecking'));
+      getPosition(true).then(function () { send(); }, function (err) {
+        setBusy(false);
+        lastLocErr = err || 'nobrowser';
+        setLocLine('bad', 'locErr');
+        hideStatus();
+        openLocModal();
+      });
+      return;
+    }
+    send();
+
+    function send() {
     setBusy(true);
     showStatus('busy', state.videoData ? t('uploadingBoth') : t('uploadingPhoto'));
 
@@ -1368,12 +1412,18 @@
       loadReport();
     }, function (err) {
       setBusy(false);
-      if (!err.server) return saveOffline(entry, vehicle);     // network dropped mid-way → keep it
+      if (!err.server) { hideStatus(); return openModal('netModal'); }   // network dropped mid-way
       var msg = cleanError(err);
       if (msg.indexOf('LINK_INVALID') !== -1) return showLinkError(t('notSubmitted'));
       if (msg.indexOf('लोकेशन') !== -1) { hideStatus(); return openLocModal(); }
       showStatus('err', msg || t('submitFail'));
     });
+    }
+  });
+
+  el('netRetry').addEventListener('click', function () {
+    closeModal('netModal');
+    el('submitBtn').click();
   });
 
   function showDone(vehicle, vendor, msg, offline) {
