@@ -947,6 +947,7 @@
     if (state.busy) el('submitBtn').textContent = t('submitting');
     if (report.data) { renderReport(); fillFilters(report.data); setRepSub(report.data); }
     if (lastLocErr !== null) el('locModalReason').textContent = locationErrorText(lastLocErr);
+    if (typeof loginState !== 'undefined' && loginState && loginState.res) { renderLoginText(); renderGoogleButton(); }
   }
 
   (function initLang() {
@@ -1119,15 +1120,29 @@
     try { localStorage.removeItem('tb_sess_' + code); localStorage.removeItem('tb_portal_p_' + code); } catch (e) {}
     location.reload();
   }
-  function showLogin(res, code) {
-    started = true;
-    el('main').classList.remove('wide');
+  var loginState = { res: null, code: '', errKey: '' };
+  function renderLoginText() {
+    var res = loginState.res;
     el('loginWho').innerHTML = '';
     var parts = t('loginMsg').split('{email}');
     el('loginWho').appendChild(document.createTextNode(parts[0] || ''));
     el('loginWho').appendChild(Object.assign(document.createElement('strong'), { textContent: res.email || '' }));
     el('loginWho').appendChild(document.createTextNode(parts[1] || ''));
+    if (loginState.errKey && !el('loginErr').hidden) el('loginErr').textContent = t(loginState.errKey, { email: res.email });
+  }
+  // Google's button in the chosen language (Google uses its own wording)
+  var GIS_LOCALE = { hi: 'hi', en: 'en', kn: 'kn', ta: 'ta', te: 'te', mr: 'mr', bn: 'bn' };
+  function renderGoogleButton() {
+    if (!(window.google && google.accounts && google.accounts.id) || IN_APP || !loginState.res) return;
+    el('gBtn').innerHTML = '';
+    google.accounts.id.renderButton(el('gBtn'), { theme: 'filled_blue', size: 'large', text: 'continue_with', shape: 'pill', width: 280, locale: GIS_LOCALE[lang] || 'hi' });
+  }
+  function showLogin(res, code) {
+    started = true;
+    loginState.res = res; loginState.code = code; loginState.errKey = '';
+    el('main').classList.remove('wide');
     el('loginErr').hidden = true;
+    renderLoginText();
     showView('login');
 
     if (IN_APP) {
@@ -1153,7 +1168,7 @@
         login_hint: res.email,
         cancel_on_tap_outside: false
       });
-      google.accounts.id.renderButton(el('gBtn'), { theme: 'filled_blue', size: 'large', text: 'continue_with', shape: 'pill', width: 280 });
+      renderGoogleButton();
       google.accounts.id.prompt();
       el('switchAcc').hidden = false;
       el('switchAcc').onclick = function () { google.accounts.id.disableAutoSelect(); google.accounts.id.prompt(); };
@@ -1169,6 +1184,7 @@
   function onGoogleCredential(cred, code, email) {
     el('loginErr').hidden = false;
     el('loginErr').style.background = '#eef2ff'; el('loginErr').style.color = '#1e3a8a';
+    loginState.errKey = 'loginChecking';
     el('loginErr').textContent = t('loginChecking');
     api('login', { code: code, idToken: cred && cred.credential }).then(function (r) {
       store('tb_sess_' + code, r.session);
@@ -1176,7 +1192,8 @@
     }, function (err) {
       var msg = cleanError(err);
       el('loginErr').style.background = ''; el('loginErr').style.color = '';
-      el('loginErr').textContent = msg.indexOf('WRONG_ACCOUNT') !== -1 ? t('loginWrong', { email: email }) : t('loginFail');
+      loginState.errKey = msg.indexOf('WRONG_ACCOUNT') !== -1 ? 'loginWrong' : 'loginFail';
+      el('loginErr').textContent = t(loginState.errKey, { email: email });
       try { google.accounts.id.disableAutoSelect(); } catch (e) {}
     });
   }
