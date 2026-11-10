@@ -1,6 +1,6 @@
 /* WheelsEye Truck Branding — keeps the app on the phone so it opens without internet.
    Change VERSION whenever index.html / config.js change, so phones pick up the new copy. */
-var VERSION = 'tb-app-v15';
+var VERSION = 'tb-app-v16';
 var SHELL = ['./', './index.html', './config.js', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', function (e) {
@@ -26,13 +26,22 @@ self.addEventListener('fetch', function (e) {
     var isAppFile = SHELL.some(function (f) { return f !== './' && url.pathname === scope + f.slice(2); });
     if (!isAppPage && !isAppFile) return;
     var key = isAppPage ? './index.html' : req;
+    var isIcon = /\.png$/i.test(url.pathname);
+
     e.respondWith(caches.open(VERSION).then(function (c) {
       return c.match(key, { ignoreSearch: true }).then(function (hit) {
-        var fresh = fetch(req).then(function (res) {
+        // Icons: from the phone first (they almost never change)
+        if (isIcon && hit) return hit;
+
+        // Page, config, manifest: always the NEWEST version when there is internet
+        // (waits up to 4 s for the network, then falls back to the saved copy)
+        var net = fetch(req, { cache: 'no-store' }).then(function (res) {
           if (res && res.ok) c.put(key, res.clone());
           return res;
-        }).catch(function () { return hit; });
-        return hit || fresh;
+        });
+        if (!hit) return net;
+        var slow = new Promise(function (resolve) { setTimeout(function () { resolve(hit); }, 4000); });
+        return Promise.race([net.catch(function () { return hit; }), slow]);
       });
     }));
     return;

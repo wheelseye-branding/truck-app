@@ -2104,7 +2104,11 @@
 
   // Keep the app on the phone so it opens without internet
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(function (reg) {
+        try { reg.update(); } catch (e) {}           // look for a newer version on every open
+      }).catch(function () {});
+    });
   }
 </script>
 </body>
