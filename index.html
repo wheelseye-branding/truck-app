@@ -946,27 +946,26 @@
     });
     // A network failure (no internet) rejects WITHOUT err.server, so callers can tell the two apart
   }
-  /* Same as api(), but reports upload progress (used for the photo / video submit) */
+  /* Photo / video submit with a progress %. Apps Script refuses the extra "permission check"
+     (CORS preflight) that real upload-progress events need, so the upload uses the same simple
+     request as api() and the % is estimated from the photo size and the connection speed. */
   function apiUpload(action, payload, onPct) {
-    if (!API_URL) return Promise.reject(Object.assign(new Error('API link missing in config.js'), { server: true }));
-    return new Promise(function (resolve, reject) {
-      var x = new XMLHttpRequest();
-      x.open('POST', API_URL, true);
-      x.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
-      x.upload.onprogress = function (e) { if (e.lengthComputable && onPct) onPct(Math.min(98, Math.round(e.loaded * 100 / e.total))); };
-      x.upload.onload = function () { if (onPct) onPct(99); };   // all sent → "saving the entry…"
-      x.onload = function () {
-        var j = null;
-        try { j = JSON.parse(x.responseText); } catch (e) {}
-        if (!j) return reject(new Error('network'));
-        if (!j.ok) return reject(Object.assign(new Error(j.error || 'Server error'), { server: true }));
-        resolve(j.data);
-      };
-      x.onerror = function () { reject(new Error('network')); };   // no err.server → treated as "no internet"
-      x.ontimeout = x.onerror;
-      x.timeout = 120000;
-      x.send(JSON.stringify(Object.assign({ action: action, session: SESSION }, payload || {})));
-    });
+    var body = JSON.stringify(Object.assign({ action: action, session: SESSION }, payload || {}));
+    var bytes = body.length;
+    var conn = navigator.connection || {};
+    var mbps = Math.max(0.4, Math.min(8, (conn.downlink || 2) / 3));     // upload is usually slower than download
+    var expectMs = (bytes * 8 / (mbps * 1e6)) * 1000;                    // time to send the photo
+    var t0 = Date.now(), timer = null;
+    if (onPct) {
+      onPct(1);
+      timer = setInterval(function () {
+        var p = Math.round(98 * (1 - Math.exp(-(Date.now() - t0) / Math.max(800, expectMs))));
+        onPct(Math.min(98, Math.max(1, p)));
+        if (Date.now() - t0 > expectMs * 1.2) onPct(99);                  // sent → "saving the entry…"
+      }, 250);
+    }
+    var stop = function () { if (timer) clearInterval(timer); };
+    return api(action, payload).then(function (d) { stop(); return d; }, function (e) { stop(); throw e; });
   }
 
   function store(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
