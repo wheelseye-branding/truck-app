@@ -919,6 +919,28 @@
     });
     // A network failure (no internet) rejects WITHOUT err.server, so callers can tell the two apart
   }
+  /* Same as api(), but reports upload progress (used for the photo / video submit) */
+  function apiUpload(action, payload, onPct) {
+    if (!API_URL) return Promise.reject(Object.assign(new Error('API link missing in config.js'), { server: true }));
+    return new Promise(function (resolve, reject) {
+      var x = new XMLHttpRequest();
+      x.open('POST', API_URL, true);
+      x.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
+      x.upload.onprogress = function (e) { if (e.lengthComputable && onPct) onPct(Math.min(99, Math.round(e.loaded * 100 / e.total))); };
+      x.onload = function () {
+        var j = null;
+        try { j = JSON.parse(x.responseText); } catch (e) {}
+        if (!j) return reject(new Error('network'));
+        if (!j.ok) return reject(Object.assign(new Error(j.error || 'Server error'), { server: true }));
+        resolve(j.data);
+      };
+      x.onerror = function () { reject(new Error('network')); };   // no err.server → treated as "no internet"
+      x.ontimeout = x.onerror;
+      x.timeout = 120000;
+      x.send(JSON.stringify(Object.assign({ action: action, session: SESSION }, payload || {})));
+    });
+  }
+
   function store(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
   function recall(key) { try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { return null; } }
 
@@ -1226,6 +1248,7 @@
     showView('form');
     showPane('form');
     refreshLocation().catch(function () {});
+    startGpsWatch();
     if (window.matchMedia('(min-width: 1000px)').matches) loadReport();
     updatePending();
     flushQueue();
@@ -1316,8 +1339,27 @@
     return t('locOff');
   }
 
+  // A live GPS watch runs while the form is open. If it gave a reading in the last 20 seconds,
+  // Location is ON right now → the submit check passes at once. Switching Location off stops the
+  // readings (and raises an error), so the check falls back to a fresh reading and fails.
+  var gpsWatch = { id: null, last: 0, pos: null };
+  function startGpsWatch() {
+    if (!navigator.geolocation || gpsWatch.id !== null) return;
+    gpsWatch.id = navigator.geolocation.watchPosition(
+      function (pos) { gpsWatch.last = Date.now(); gpsWatch.pos = pos; },
+      function () { gpsWatch.last = 0; gpsWatch.pos = null; },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 }
+    );
+  }
+  function locationIsLive() {
+    if (gpsWatch.last && Date.now() - gpsWatch.last < 20000) return Promise.resolve();
+    return getPosition(true);
+  }
+
   // fresh = true → a live GPS reading right now, so a phone with Location switched off cannot pass
   function getPosition(fresh) {
+    // A live watch reading from the last 10 seconds is as good as a new one — and instant
+    if (fresh && gpsWatch.pos && Date.now() - gpsWatch.last < 10000) return Promise.resolve(gpsWatch.pos);
     return new Promise(function (resolve, reject) {
       if (!navigator.geolocation) return reject('nobrowser');
       navigator.geolocation.getCurrentPosition(resolve, reject, {
@@ -1610,7 +1652,7 @@
     if (link.locationRequired) {
       setBusy(true);
       showStatus('busy', t('locChecking'));
-      getPosition(true).then(function () { send(); }, function (err) {
+      locationIsLive().then(function () { send(); }, function (err) {
         setBusy(false);
         lastLocErr = err || 'nobrowser';
         setLocLine('bad', 'locErr');
@@ -1625,7 +1667,9 @@
     setBusy(true);
     showStatus('busy', state.videoData ? t('uploadingBoth') : t('uploadingPhoto'));
 
-    api('submit', { data: entry }).then(function (res) {
+    apiUpload('submit', { data: entry }, function (pct) {
+      showStatus('busy', (state.videoData ? t('uploadingBoth') : t('uploadingPhoto')) + ' ' + pct + '%');
+    }).then(function (res) {
       setBusy(false);
       hideStatus();
       showDone(vehicle, (res && res.vendor) || link.vendor,
