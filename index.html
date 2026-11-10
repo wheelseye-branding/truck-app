@@ -1146,13 +1146,15 @@
     if (!kind) return showLinkError('');
 
     var key = 'tb_portal_' + kind + '_' + code;
+    // The paster's own sign-in for this link (an old admin pass, if any, is removed)
+    try { localStorage.removeItem('tb_admin_sess'); localStorage.removeItem('tb_admin_email'); } catch (e) {}
     SESSION = (kind === 'p' && recall('tb_sess_' + code)) || '';
     var cached = recall(key);
     if (cached && !cached.needLogin) startPortal(cached, code);
 
     api('portal', { kind: kind, code: code }).then(function (res) {
       if (res.needLogin) {
-        try { localStorage.removeItem(key); localStorage.removeItem('tb_sess_' + code); } catch (e) {}
+        try { localStorage.removeItem(key); localStorage.removeItem('tb_sess_' + code); localStorage.removeItem('tb_admin_sess'); } catch (e) {}
         return showLogin(res, code);
       }
       store(key, res);
@@ -1168,7 +1170,7 @@
   /* ───── Google sign-in (only for pasters with ID check ON) ───── */
   var IN_APP = /; wv\)|FBAN|FBAV|Instagram|WhatsApp|Line\//i.test(navigator.userAgent);
   function loginExpired(code) {
-    try { localStorage.removeItem('tb_sess_' + code); localStorage.removeItem('tb_portal_p_' + code); } catch (e) {}
+    try { localStorage.removeItem('tb_sess_' + code); localStorage.removeItem('tb_portal_p_' + code); localStorage.removeItem('tb_admin_sess'); } catch (e) {}
     location.reload();
   }
   var loginState = { res: null, code: '', errKey: '' };
