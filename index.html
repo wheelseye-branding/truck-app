@@ -300,6 +300,10 @@
     .status.err { background: var(--err-bg); color: var(--err); }
     .status.busy { background: var(--brand-soft); color: var(--brand); }
     .admin-note { margin: 10px 0 0; padding: 10px 12px; border-radius: 10px; background: #fff8e1; border-left: 4px solid var(--plate); font-size: 0.92rem; font-weight: 600; }
+    .pup { margin: 10px 0 4px; padding: 10px 12px; border-radius: 12px; background: var(--brand-soft); color: var(--brand); font-size: 0.92rem; }
+    .pup.ok { background: var(--ok-bg); color: var(--ok); }
+    .pup.ok .upbar, .pup.bad .upbar { display: none; }
+    .pup.bad { background: #fff7ed; color: #9a3412; }
     .upbar { margin-top: 10px; height: 12px; border-radius: 999px; background: #ffffff; overflow: hidden; }
     .upbar i { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #1e3a8a, #4f46e5); transition: width .25s; }
     .upbar.wait i { width: 100% !important; background: linear-gradient(90deg, #4f46e5 0%, #a5b4fc 50%, #4f46e5 100%); background-size: 200% 100%; animation: upwait 1.2s linear infinite; }
@@ -499,6 +503,10 @@
       <p class="field-err" id="photoErr" data-i18n="takePhoto"></p>
       <div id="photoDone" hidden>
         <div class="preview"><img id="photoPreview" alt=""></div>
+        <div class="pup" id="photoUp" hidden>
+          <div class="uprow"><span id="photoUpText"></span><span id="photoUpPct"></span></div>
+          <div class="upbar" id="photoUpBarBox"><i id="photoUpBar"></i></div>
+        </div>
         <div class="row-actions">
           <span class="mini"><span data-i18n="retakePhoto"></span>
             <input type="file" class="photoInput" accept="image/*" capture="environment" data-i18n-aria="retakePhoto">
@@ -577,7 +585,7 @@
   </div><!-- /layout -->
   </div><!-- /appView -->
 
-  <p class="foot">WheelsEye · Truck Branding Programme</p>
+  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v19</span></p>
 </main>
 
 <!-- Pop-up: location is off -->
@@ -711,6 +719,13 @@
     switchAcc:     ['दूसरा account चुनें', 'Use another account', 'ಬೇರೆ ಖಾತೆ ಬಳಸಿ', 'வேறு கணக்கைப் பயன்படுத்து', 'వేరే ఖాతా వాడండి', 'दुसरे खाते वापरा', 'অন্য অ্যাকাউন্ট ব্যবহার করুন'],
     adminFill:     ['एडमिन मोड: {admin} इस पेस्टर की ओर से भर रहे हैं।', 'Admin mode: {admin} is filling this form for the paster.', 'ಅಡ್ಮಿನ್ ಮೋಡ್: {admin} ಈ ಪೇಸ್ಟರ್ ಪರವಾಗಿ ತುಂಬುತ್ತಿದ್ದಾರೆ.',
                     'நிர்வாகி முறை: {admin} இந்த பேஸ்டருக்காக நிரப்புகிறார்.', 'అడ్మిన్ మోడ్: {admin} ఈ పేస్టర్ తరఫున నింపుతున్నారు.', 'ॲडमिन मोड: {admin} या पेस्टरतर्फे भरत आहेत.', 'অ্যাডমিন মোড: {admin} এই পেস্টারের হয়ে পূরণ করছেন।'],
+    photoUploaded: ['✓ फ़ोटो अपलोड हो गई', '✓ Photo uploaded', '✓ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಆಯಿತು', '✓ புகைப்படம் பதிவேற்றப்பட்டது', '✓ ఫోటో అప్‌లోడ్ అయింది', '✓ फोटो अपलोड झाला', '✓ ছবি আপলোড হয়েছে'],
+    photoUpFail:   ['फ़ोटो अभी अपलोड नहीं हुई — जमा करते समय दोबारा भेजी जाएगी।', 'Photo not uploaded yet — it will be sent again when you submit.', 'ಫೋಟೋ ಇನ್ನೂ ಅಪ್‌ಲೋಡ್ ಆಗಿಲ್ಲ — ಸಲ್ಲಿಸುವಾಗ ಮತ್ತೆ ಕಳುಹಿಸಲಾಗುತ್ತದೆ.',
+                    'புகைப்படம் இன்னும் பதிவேற்றப்படவில்லை — சமர்ப்பிக்கும்போது மீண்டும் அனுப்பப்படும்.', 'ఫోటో ఇంకా అప్‌లోడ్ కాలేదు — సమర్పించేటప్పుడు మళ్ళీ పంపబడుతుంది.', 'फोटो अजून अपलोड झाला नाही — सबमिट करताना पुन्हा पाठवला जाईल.', 'ছবি এখনও আপলোড হয়নি — জমা দেওয়ার সময় আবার পাঠানো হবে।'],
+    photoUpOffline:['नेटवर्क नहीं है — फ़ोटो जमा करते समय भेजी जाएगी।', 'No network — the photo will be sent when you submit.', 'ನೆಟ್‌ವರ್ಕ್ ಇಲ್ಲ — ಸಲ್ಲಿಸುವಾಗ ಫೋಟೋ ಕಳುಹಿಸಲಾಗುತ್ತದೆ.', 'நெட்வொர்க் இல்லை — சமர்ப்பிக்கும்போது புகைப்படம் அனுப்பப்படும்.',
+                    'నెట్‌వర్క్ లేదు — సమర్పించేటప్పుడు ఫోటో పంపబడుతుంది.', 'नेटवर्क नाही — सबमिट करताना फोटो पाठवला जाईल.', 'নেটওয়ার্ক নেই — জমা দেওয়ার সময় ছবি পাঠানো হবে।'],
+    photoUpAlmost: ['फ़ोटो अपलोड लगभग पूरी…', 'Photo upload almost done…', 'ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಬಹುತೇಕ ಮುಗಿದಿದೆ…', 'புகைப்பட பதிவேற்றம் கிட்டத்தட்ட முடிந்தது…', 'ఫోటో అప్‌లోడ్ దాదాపు పూర్తి…', 'फोटो अपलोड जवळपास पूर्ण…', 'ছবি আপলোড প্রায় শেষ…'],
+    photoFinishing:['फ़ोटो अपलोड पूरी हो रही है…', 'Finishing the photo upload…', 'ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮುಗಿಸಲಾಗುತ್ತಿದೆ…', 'புகைப்பட பதிவேற்றம் முடிகிறது…', 'ఫోటో అప్‌లోడ్ పూర్తవుతోంది…', 'फोटो अपलोड पूर्ण होत आहे…', 'ছবি আপলোড শেষ হচ্ছে…'],
     savingEntry:   ['फ़ोटो पहुँच गई — एंट्री सेव हो रही है…', 'Photo sent — saving the entry…', 'ಫೋಟೋ ತಲುಪಿತು — ಎಂಟ್ರಿ ಉಳಿಸಲಾಗುತ್ತಿದೆ…', 'புகைப்படம் அனுப்பப்பட்டது — பதிவு சேமிக்கப்படுகிறது…',
                     'ఫోటో చేరింది — ఎంట్రీ సేవ్ అవుతోంది…', 'फोटो पोहोचला — एंट्री सेव्ह होत आहे…', 'ছবি পৌঁছেছে — এন্ট্রি সেভ হচ্ছে…'],
     loginChecking: ['Login जाँच रहे हैं…', 'Checking sign-in…', 'ಲಾಗಿನ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ…', 'உள்நுழைவு சரிபார்க்கப்படுகிறது…', 'లాగిన్ తనిఖీ చేస్తోంది…', 'लॉगिन तपासत आहोत…', 'লগইন যাচাই করা হচ্ছে…'],
@@ -940,7 +955,14 @@
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },   // plain text = no extra permission request
       body: JSON.stringify(Object.assign({ action: action, session: SESSION }, payload || {})),
       redirect: 'follow'
-    }).then(function (r) { return r.json(); }).then(function (j) {
+    }).then(function (r) {
+      return r.text().then(function (txt) {
+        try { return JSON.parse(txt); } catch (e) {
+          var hint = (txt || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160);
+          throw Object.assign(new Error('SERVER_REPLY: ' + (r.status || '') + ' ' + (hint || 'empty reply')), { server: true });
+        }
+      });
+    }).then(function (j) {
       if (!j || !j.ok) throw Object.assign(new Error((j && j.error) || 'Server error'), { server: true });
       return j.data;
     });
@@ -998,6 +1020,7 @@
     if (lastLocErr !== null) el('locModalReason').textContent = locationErrorText(lastLocErr);
     if (typeof loginState !== 'undefined' && loginState && loginState.res) { renderLoginText(); renderGoogleButton(); }
     if (typeof link !== 'undefined' && link && link.filledBy) el('adminNote').textContent = t('adminFill', { admin: link.filledBy });
+    if (typeof state !== 'undefined' && state && state.up) renderPhotoUp();
   }
 
   (function initLang() {
@@ -1525,6 +1548,7 @@
       el('photoOpen').hidden = true;
       el('photoDone').hidden = false;
       hideStatus();
+      startPhotoUpload();
       if (after) after();
     };
     img.onerror = function () {
@@ -1532,6 +1556,44 @@
       showStatus('err', t('photoReadFail'));
     };
     img.src = url;
+  }
+
+  /* ───── Photo upload starts as soon as the photo is taken ───── */
+  var upSeq = 0;
+  function renderPhotoUp() {
+    var u = state.up || {}, box = el('photoUp');
+    if (!u.status) { box.hidden = true; return; }
+    box.hidden = false;
+    box.className = 'pup' + (u.status === 'done' ? ' ok' : (u.status === 'failed' || u.status === 'offline' ? ' bad' : ''));
+    var pct = u.pct || 0;
+    el('photoUpText').textContent = u.status === 'done' ? t('photoUploaded')
+      : u.status === 'failed' ? t('photoUpFail')
+      : u.status === 'offline' ? t('photoUpOffline')
+      : (pct >= 99 ? t('photoUpAlmost') : t('uploadingPhoto'));
+    el('photoUpPct').textContent = u.status === 'uploading' && pct < 99 ? pct + '%' : '';
+    el('photoUpBarBox').className = 'upbar' + (u.status === 'uploading' && pct >= 99 ? ' wait' : '');
+    el('photoUpBar').style.width = Math.max(3, pct) + '%';
+  }
+  function startPhotoUpload() {
+    var old = state.up && state.up.id;
+    if (old) api('discard', { code: link.code, id: old }).catch(function () {});      // retaken photo
+    var my = ++upSeq;
+    if (!navigator.onLine || !state.photoData) { state.up = { status: 'offline' }; renderPhotoUp(); return; }
+    state.up = { status: 'uploading', pct: 1, id: null, promise: null };
+    renderPhotoUp();
+    state.up.promise = apiUpload('upload', { code: link.code, data: state.photoData }, function (pct) {
+      if (my !== upSeq) return;
+      state.up.pct = pct; renderPhotoUp();
+    }).then(function (r) {
+      if (my !== upSeq) { api('discard', { code: link.code, id: r.id }).catch(function () {}); return null; }
+      state.up.status = 'done'; state.up.id = r.id; state.up.pct = 100; renderPhotoUp();
+      return r.id;
+    }, function (err) {
+      if (my !== upSeq) return null;
+      if (err && err.server && cleanError(err).indexOf('LOGIN_REQUIRED') !== -1) { loginExpired(link.code); return null; }
+      state.up.status = 'failed'; renderPhotoUp();
+      return null;
+    });
   }
 
   /* Best-looking JPEG that fits the size limit: lower the quality step by step, and only if
@@ -1698,9 +1760,21 @@
 
     function send() {
     setBusy(true);
-    showUpload(0);
+    var u = state.up || {};
+    // Photo still uploading → let it finish first (shown here and under the photo)
+    if (u.status === 'uploading' && u.promise) {
+      showStatus('busy', t('photoFinishing'));
+      return u.promise.then(function () { setBusy(false); send(); });
+    }
+    var usePre = u.status === 'done' && u.id;
+    if (usePre) { entry.photoId = u.id; entry.photoData = ''; }
+    else { entry.photoId = ''; entry.photoData = state.photoData; }
 
-    apiUpload('submit', { data: entry }, function (pct) { showUpload(pct); }).then(function (res) {
+    // Only the details are left to send when the photo is already up → straight to "saving…"
+    var heavy = !usePre || !!entry.videoData;
+    showUpload(heavy ? 0 : 99);
+
+    apiUpload('submit', { data: entry }, heavy ? function (pct) { showUpload(pct); } : null).then(function (res) {
       setBusy(false);
       hideStatus();
       showDone(vehicle, (res && res.vendor) || link.vendor,
@@ -1710,6 +1784,10 @@
       setBusy(false);
       if (!err.server) { hideStatus(); return openModal('netModal'); }   // network dropped mid-way
       var msg = cleanError(err);
+      if (msg.indexOf('PHOTO_MISSING') !== -1 && entry.photoId) {     // uploaded file gone → send the photo itself
+        state.up = { status: 'failed' }; renderPhotoUp();
+        return send();
+      }
       if (msg.indexOf('LOGIN_REQUIRED') !== -1) return loginExpired(link.code);
       if (msg.indexOf('LINK_INVALID') !== -1) return showLinkError(t('notSubmitted'));
       if (msg.indexOf('लोकेशन') !== -1) { hideStatus(); return openLocModal(); }
@@ -1842,6 +1920,7 @@
     el('vehicle').dispatchEvent(new Event('input'));
     clearPhoto();
     clearVideo();
+    upSeq++; state.up = null; renderPhotoUp();
     setInvalid('sticker', false);
     setInvalid('vehicle', false);
     setInvalid('photo', false);
