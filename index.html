@@ -283,6 +283,11 @@
     .status.show { display: block; }
     .status.err { background: var(--err-bg); color: var(--err); }
     .status.busy { background: var(--brand-soft); color: var(--brand); }
+    .upbar { margin-top: 10px; height: 12px; border-radius: 999px; background: #ffffff; overflow: hidden; }
+    .upbar i { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #1e3a8a, #4f46e5); transition: width .25s; }
+    .upbar.wait i { width: 100% !important; background: linear-gradient(90deg, #4f46e5 0%, #a5b4fc 50%, #4f46e5 100%); background-size: 200% 100%; animation: upwait 1.2s linear infinite; }
+    @keyframes upwait { from { background-position: 200% 0; } to { background-position: 0 0; } }
+    .uprow { display: flex; justify-content: space-between; gap: 10px; font-weight: 600; }
     .status.ok { background: var(--ok-bg); color: var(--ok); }
 
     .done { display: none; text-align: center; padding: 40px 10px; }
@@ -686,6 +691,8 @@
     linkCopied:    ['लिंक कॉपी हो गया — Chrome में पेस्ट करें।', 'Link copied — paste it in Chrome.', 'ಲಿಂಕ್ ಕಾಪಿ ಆಯಿತು — Chrome ನಲ್ಲಿ ಪೇಸ್ಟ್ ಮಾಡಿ.', 'இணைப்பு நகலெடுக்கப்பட்டது — Chrome-இல் ஒட்டவும்.', 'లింక్ కాపీ అయింది — Chrome లో పేస్ట్ చేయండి.', 'लिंक कॉपी झाली — Chrome मध्ये पेस्ट करा.', 'লিঙ্ক কপি হয়েছে — Chrome-এ পেস্ট করুন।'],
     loginNote:     ['फ़ोन यह login 30 दिन याद रखेगा।', 'This phone will remember the sign-in for 30 days.', 'ಈ ಫೋನ್ 30 ದಿನ ಲಾಗಿನ್ ನೆನಪಿಡುತ್ತದೆ.', 'இந்த போன் 30 நாட்கள் உள்நுழைவை நினைவில் வைக்கும்.', 'ఈ ఫోన్ 30 రోజులు లాగిన్ గుర్తుంచుకుంటుంది.', 'हा फोन 30 दिवस लॉगिन लक्षात ठेवेल.', 'এই ফোন ৩০ দিন লগইন মনে রাখবে।'],
     switchAcc:     ['दूसरा account चुनें', 'Use another account', 'ಬೇರೆ ಖಾತೆ ಬಳಸಿ', 'வேறு கணக்கைப் பயன்படுத்து', 'వేరే ఖాతా వాడండి', 'दुसरे खाते वापरा', 'অন্য অ্যাকাউন্ট ব্যবহার করুন'],
+    savingEntry:   ['फ़ोटो पहुँच गई — एंट्री सेव हो रही है…', 'Photo sent — saving the entry…', 'ಫೋಟೋ ತಲುಪಿತು — ಎಂಟ್ರಿ ಉಳಿಸಲಾಗುತ್ತಿದೆ…', 'புகைப்படம் அனுப்பப்பட்டது — பதிவு சேமிக்கப்படுகிறது…',
+                    'ఫోటో చేరింది — ఎంట్రీ సేవ్ అవుతోంది…', 'फोटो पोहोचला — एंट्री सेव्ह होत आहे…', 'ছবি পৌঁছেছে — এন্ট্রি সেভ হচ্ছে…'],
     loginChecking: ['Login जाँच रहे हैं…', 'Checking sign-in…', 'ಲಾಗಿನ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ…', 'உள்நுழைவு சரிபார்க்கப்படுகிறது…', 'లాగిన్ తనిఖీ చేస్తోంది…', 'लॉगिन तपासत आहोत…', 'লগইন যাচাই করা হচ্ছে…'],
     firstOnline:   ['पहली बार यह लिंक इंटरनेट चालू करके खोलें।', 'Open this link with internet the first time.', 'ಮೊದಲ ಬಾರಿ ಈ ಲಿಂಕ್ ಅನ್ನು ಇಂಟರ್ನೆಟ್ ಆನ್ ಮಾಡಿ ತೆರೆಯಿರಿ.',
                     'முதல் முறை இணையத்துடன் இந்த இணைப்பைத் திறக்கவும்.', 'మొదటిసారి ఇంటర్నెట్ ఆన్ చేసి ఈ లింక్ తెరవండి.', 'पहिल्यांदा ही लिंक इंटरनेट चालू करून उघडा.', 'প্রথমবার ইন্টারনেট চালু করে এই লিঙ্কটি খুলুন।'],
@@ -926,7 +933,8 @@
       var x = new XMLHttpRequest();
       x.open('POST', API_URL, true);
       x.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
-      x.upload.onprogress = function (e) { if (e.lengthComputable && onPct) onPct(Math.min(99, Math.round(e.loaded * 100 / e.total))); };
+      x.upload.onprogress = function (e) { if (e.lengthComputable && onPct) onPct(Math.min(98, Math.round(e.loaded * 100 / e.total))); };
+      x.upload.onload = function () { if (onPct) onPct(99); };   // all sent → "saving the entry…"
       x.onload = function () {
         var j = null;
         try { j = JSON.parse(x.responseText); } catch (e) {}
@@ -1665,11 +1673,9 @@
 
     function send() {
     setBusy(true);
-    showStatus('busy', state.videoData ? t('uploadingBoth') : t('uploadingPhoto'));
+    showUpload(0);
 
-    apiUpload('submit', { data: entry }, function (pct) {
-      showStatus('busy', (state.videoData ? t('uploadingBoth') : t('uploadingPhoto')) + ' ' + pct + '%');
-    }).then(function (res) {
+    apiUpload('submit', { data: entry }, function (pct) { showUpload(pct); }).then(function (res) {
       setBusy(false);
       hideStatus();
       showDone(vehicle, (res && res.vendor) || link.vendor,
@@ -2041,6 +2047,27 @@
     s.className = 'status show ' + kind;
     s.textContent = text;
   }
+  /* Upload progress: "% sent" with a bar, then "saving…" with a moving bar until the server answers */
+  function showUpload(pct) {
+    var s = el('status');
+    s.className = 'status show busy';
+    s.innerHTML = '';
+    var saving = pct >= 99;
+    var label = saving ? t('savingEntry') : (state.videoData ? t('uploadingBoth') : t('uploadingPhoto'));
+    var row = document.createElement('div');
+    row.className = 'uprow';
+    var a = document.createElement('span'); a.textContent = label;
+    row.appendChild(a);
+    if (!saving) { var b = document.createElement('span'); b.textContent = pct + '%'; row.appendChild(b); }
+    var bar = document.createElement('div');
+    bar.className = 'upbar' + (saving ? ' wait' : '');
+    var fill = document.createElement('i');
+    fill.style.width = Math.max(3, pct) + '%';
+    bar.appendChild(fill);
+    s.appendChild(row);
+    s.appendChild(bar);
+  }
+
   function hideStatus() {
     var s = el('status');
     s.className = 'status';
