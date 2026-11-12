@@ -1,6 +1,6 @@
 /* WheelsEye Truck Branding — keeps the app on the phone so it opens without internet.
    Change VERSION whenever index.html / config.js change, so phones pick up the new copy. */
-var VERSION = 'tb-app-v22';
+var VERSION = 'tb-app-v24';
 var SHELL = ['./', './index.html', './config.js', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', function (e) {

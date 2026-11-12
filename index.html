@@ -585,7 +585,7 @@
   </div><!-- /layout -->
   </div><!-- /appView -->
 
-  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v22</span></p>
+  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v24</span></p>
 </main>
 
 <!-- Pop-up: location is off -->
@@ -721,6 +721,8 @@
     switchAcc:     ['दूसरा account चुनें', 'Use another account', 'ಬೇರೆ ಖಾತೆ ಬಳಸಿ', 'வேறு கணக்கைப் பயன்படுத்து', 'వేరే ఖాతా వాడండి', 'दुसरे खाते वापरा', 'অন্য অ্যাকাউন্ট ব্যবহার করুন'],
     adminFill:     ['एडमिन मोड: {admin} इस पेस्टर की ओर से भर रहे हैं।', 'Admin mode: {admin} is filling this form for the paster.', 'ಅಡ್ಮಿನ್ ಮೋಡ್: {admin} ಈ ಪೇಸ್ಟರ್ ಪರವಾಗಿ ತುಂಬುತ್ತಿದ್ದಾರೆ.',
                     'நிர்வாகி முறை: {admin} இந்த பேஸ்டருக்காக நிரப்புகிறார்.', 'అడ్మిన్ మోడ్: {admin} ఈ పేస్టర్ తరఫున నింపుతున్నారు.', 'ॲडमिन मोड: {admin} या पेस्टरतर्फे भरत आहेत.', 'অ্যাডমিন মোড: {admin} এই পেস্টারের হয়ে পূরণ করছেন।'],
+    photoStamping: ['फ़ोटो पर समय और लोकेशन लग रही है…', 'Adding time and location to the photo…', 'ಫೋಟೋಗೆ ಸಮಯ ಮತ್ತು ಸ್ಥಳ ಸೇರಿಸಲಾಗುತ್ತಿದೆ…', 'புகைப்படத்தில் நேரமும் இருப்பிடமும் சேர்க்கப்படுகிறது…',
+                    'ఫోటోకు సమయం, లొకేషన్ జోడిస్తోంది…', 'फोटोवर वेळ आणि लोकेशन लावत आहोत…', 'ছবিতে সময় ও লোকেশন যোগ হচ্ছে…'],
     photoUploaded: ['✓ फ़ोटो अपलोड हो गई', '✓ Photo uploaded', '✓ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಆಯಿತು', '✓ புகைப்படம் பதிவேற்றப்பட்டது', '✓ ఫోటో అప్‌లోడ్ అయింది', '✓ फोटो अपलोड झाला', '✓ ছবি আপলোড হয়েছে'],
     photoUpFail:   ['फ़ोटो अभी अपलोड नहीं हुई — जमा करते समय दोबारा भेजी जाएगी।', 'Photo not uploaded yet — it will be sent again when you submit.', 'ಫೋಟೋ ಇನ್ನೂ ಅಪ್‌ಲೋಡ್ ಆಗಿಲ್ಲ — ಸಲ್ಲಿಸುವಾಗ ಮತ್ತೆ ಕಳುಹಿಸಲಾಗುತ್ತದೆ.',
                     'புகைப்படம் இன்னும் பதிவேற்றப்படவில்லை — சமர்ப்பிக்கும்போது மீண்டும் அனுப்பப்படும்.', 'ఫోటో ఇంకా అప్‌లోడ్ కాలేదు — సమర్పించేటప్పుడు మళ్ళీ పంపబడుతుంది.', 'फोटो अजून अपलोड झाला नाही — सबमिट करताना पुन्हा पाठवला जाईल.', 'ছবি এখনও আপলোড হয়নি — জমা দেওয়ার সময় আবার পাঠানো হবে।'],
@@ -1379,6 +1381,7 @@
       hint.textContent = t('vehicleEnter');
     }
 
+    if (state.preparing) return showStatus('busy', t('photoStamping'));
     var photoOk = !!state.photoData;
     setInvalid('photo', !photoOk);
     if (!photoOk) { missing.push(t('truckPhoto')); first = first || el('photoOpen'); }
@@ -1420,7 +1423,14 @@
   function startGpsWatch() {
     if (!navigator.geolocation || gpsWatch.id !== null) return;
     gpsWatch.id = navigator.geolocation.watchPosition(
-      function (pos) { gpsWatch.last = Date.now(); gpsWatch.pos = pos; },
+      function (pos) {
+        gpsWatch.last = Date.now(); gpsWatch.pos = pos;
+        // Ask for this spot's City / Pincode in advance (at most every 20 s), so the photo stamp is instant
+        if (!gpsWatch.pre || Date.now() - gpsWatch.pre > 20000) {
+          gpsWatch.pre = Date.now();
+          getAddress(pos.coords.latitude, pos.coords.longitude, 8000).catch(function () {});
+        }
+      },
       function () { gpsWatch.last = 0; gpsWatch.pos = null; },
       { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 }
     );
@@ -1442,14 +1452,14 @@
     });
   }
 
-  function getAddress(lat, lng) {
+  function getAddress(lat, lng, waitMs) {
     var key = lat.toFixed(3) + ',' + lng.toFixed(3);
     var known = geoGet(key);
     if (known) return Promise.resolve(known);
     if (!navigator.onLine) return Promise.resolve({});    // offline: lat/long only, city filled in later
     var call = api('address', { code: link.code, lat: lat, lng: lng })
       .then(function (a) { a = a || {}; geoPut(key, a); return a; }, function () { return {}; });
-    var slow = new Promise(function (resolve) { setTimeout(function () { resolve({}); }, 6000); });
+    var slow = new Promise(function (resolve) { setTimeout(function () { resolve({}); }, waitMs || 2500); });
     return Promise.race([call, slow]);
   }
 
@@ -1467,7 +1477,13 @@
         time: Date.now(),
         city: '', state: '', pincode: ''
       };
-      return getAddress(l.lat, l.lng).then(function (a) {
+      // For the photo stamp the place name is a must: wait up to 10 s, and try once more if it is empty
+      var ask = function () { return getAddress(l.lat, l.lng, fresh ? 10000 : 2500); };
+      return ask().then(function (a) {
+        if (fresh && navigator.onLine && !(a && (a.city || a.state || a.pincode))) return getAddress(l.lat, l.lng, 6000);
+        return a;
+      }).then(function (a) {
+        a = a || {};
         l.city = a.city || ''; l.state = a.state || ''; l.pincode = a.pincode || '';
         loc = l;
         lastLocErr = null;
@@ -1534,7 +1550,19 @@
   function handlePhoto(file) {
     if (!/^image\//.test(file.type || 'image/')) return showStatus('err', t('notPhoto'));
     if (!isFresh(file)) return showStatus('err', t('oldPhoto'));
-    showStatus('busy', t('locGetting'));
+    // Show the photo straight away; the stamped copy replaces it a moment later
+    try {
+      if (state.rawUrl) URL.revokeObjectURL(state.rawUrl);
+      state.rawUrl = URL.createObjectURL(file);
+      el('photoPreview').src = state.rawUrl;
+      el('photoOpen').hidden = true;
+      el('photoDone').hidden = false;
+      setInvalid('photo', false);
+    } catch (e) {}
+    state.preparing = true;
+    var prevId = state.up && state.up.id;
+    upSeq++; state.up = { status: 'stamping', id: prevId }; renderPhotoUp();
+    hideStatus();
     refreshLocation(true).then(function (l) {
       drawPhoto(file, l);
     }, function () {
@@ -1544,17 +1572,16 @@
   }
 
   function drawPhoto(file, l, after) {
-    showStatus('busy', t('photoPreparing'));
     var url = URL.createObjectURL(file);
     var img = new Image();
-    img.onload = function () {
-      var w = img.naturalWidth, h = img.naturalHeight;
+    var finish = function (src, w, h) {
       var scale = Math.min(1, PHOTO_MAX_SIDE / Math.max(w, h));
       var canvas = document.createElement('canvas');
       canvas.width = Math.round(w * scale);
       canvas.height = Math.round(h * scale);
       var ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(src, 0, 0, canvas.width, canvas.height);
+      if (src.close) try { src.close(); } catch (e) {}
       stampInfo(ctx, canvas.width, canvas.height, l);
       URL.revokeObjectURL(url);
 
@@ -1566,15 +1593,27 @@
       el('photoPreview').src = state.photoData;
       el('photoOpen').hidden = true;
       el('photoDone').hidden = false;
+      if (state.rawUrl) { try { URL.revokeObjectURL(state.rawUrl); } catch (e) {} state.rawUrl = null; }
+      state.preparing = false;
       hideStatus();
       startPhotoUpload();
       if (after) after();
     };
-    img.onerror = function () {
-      URL.revokeObjectURL(url);
-      showStatus('err', t('photoReadFail'));
+    var viaImg = function () {
+      img.onload = function () { finish(img, img.naturalWidth, img.naturalHeight); };
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        state.preparing = false;
+        state.up = null; renderPhotoUp();
+        showStatus('err', t('photoReadFail'));
+      };
+      img.src = url;
     };
-    img.src = url;
+    if (window.createImageBitmap) {
+      createImageBitmap(file).then(function (bmp) { finish(bmp, bmp.width, bmp.height); }, viaImg);
+    } else {
+      viaImg();
+    }
   }
 
   /* ───── Photo upload starts as soon as the photo is taken ───── */
@@ -1585,12 +1624,13 @@
     box.hidden = false;
     box.className = 'pup' + (u.status === 'done' ? ' ok' : (u.status === 'failed' || u.status === 'offline' ? ' bad' : ''));
     var pct = u.pct || 0;
-    el('photoUpText').textContent = u.status === 'done' ? t('photoUploaded')
+    el('photoUpText').textContent = u.status === 'stamping' ? t('photoStamping')
+      : u.status === 'done' ? t('photoUploaded')
       : u.status === 'failed' ? t('photoUpFail')
       : u.status === 'offline' ? t('photoUpOffline')
       : (pct >= 99 ? t('photoUpAlmost') : t('uploadingPhoto'));
     el('photoUpPct').textContent = u.status === 'uploading' && pct < 99 ? pct + '%' : '';
-    el('photoUpBarBox').className = 'upbar' + (u.status === 'uploading' && pct >= 99 ? ' wait' : '');
+    el('photoUpBarBox').className = 'upbar' + ((u.status === 'uploading' && pct >= 99) || u.status === 'stamping' ? ' wait' : '');
     el('photoUpBar').style.width = Math.max(3, pct) + '%';
   }
   function startPhotoUpload() {
@@ -1939,7 +1979,7 @@
     el('vehicle').dispatchEvent(new Event('input'));
     clearPhoto();
     clearVideo();
-    upSeq++; state.up = null; renderPhotoUp();
+    upSeq++; state.up = null; state.preparing = false; renderPhotoUp();
     setInvalid('sticker', false);
     setInvalid('vehicle', false);
     setInvalid('photo', false);
