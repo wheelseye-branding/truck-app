@@ -585,7 +585,7 @@
   </div><!-- /layout -->
   </div><!-- /appView -->
 
-  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v21</span></p>
+  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v22</span></p>
 </main>
 
 <!-- Pop-up: location is off -->
@@ -943,7 +943,23 @@
   var loc = null;          // { lat, lng, acc, time, city, state, pincode }
   var locView = { kind: '', key: 'locGetting', text: '' };   // what the location line shows
   var lastLocErr = null;
-  var geoCache = {};
+  // Place names (City / State / Pincode) for ~110 m squares, kept on the phone for 24 hours,
+  // so a paster working in one yard asks Google once instead of for every truck.
+  // Lat / Long themselves are always live from GPS.
+  var GEO_KEY = 'tb_geo', GEO_TTL = 24 * 3600 * 1000;
+  var geoCache = (function () {
+    var saved = recall(GEO_KEY) || {}, now = Date.now(), out = {};
+    Object.keys(saved).forEach(function (k) { if (saved[k] && now - saved[k].t < GEO_TTL) out[k] = saved[k]; });
+    return out;
+  })();
+  function geoGet(key) { var g = geoCache[key]; return g && Date.now() - g.t < GEO_TTL ? g.a : null; }
+  function geoPut(key, a) {
+    if (!a || !(a.city || a.state || a.pincode)) return;            // never remember an empty answer
+    geoCache[key] = { a: a, t: Date.now() };
+    var keys = Object.keys(geoCache);
+    if (keys.length > 400) keys.sort(function (x, y) { return geoCache[x].t - geoCache[y].t; }).slice(0, keys.length - 400).forEach(function (k) { delete geoCache[k]; });
+    store(GEO_KEY, geoCache);
+  }
 
   var el = function (id) { return document.getElementById(id); };
 
@@ -1428,10 +1444,11 @@
 
   function getAddress(lat, lng) {
     var key = lat.toFixed(3) + ',' + lng.toFixed(3);
-    if (geoCache[key]) return Promise.resolve(geoCache[key]);
+    var known = geoGet(key);
+    if (known) return Promise.resolve(known);
     if (!navigator.onLine) return Promise.resolve({});    // offline: lat/long only, city filled in later
     var call = api('address', { code: link.code, lat: lat, lng: lng })
-      .then(function (a) { geoCache[key] = a || {}; return geoCache[key]; }, function () { return {}; });
+      .then(function (a) { a = a || {}; geoPut(key, a); return a; }, function () { return {}; });
     var slow = new Promise(function (resolve) { setTimeout(function () { resolve({}); }, 6000); });
     return Promise.race([call, slow]);
   }
