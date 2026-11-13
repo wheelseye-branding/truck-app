@@ -25,7 +25,7 @@
   <link rel="icon" href="icon-192.png">
   <link rel="apple-touch-icon" href="icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="WE Branding">
+  <meta name="apple-mobile-web-app-title" content="WE Branding Form">
   <script src="config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -208,15 +208,20 @@
     .notice { margin-top: 12px; padding: 14px; border-radius: var(--radius-sm); background: #fff8e1; border-left: 4px solid var(--plate); }
     .boot { text-align: center; padding: 60px 18px; color: var(--muted); }
 
+    /* Vendor + paster: two left-aligned rows, white card with a brand bar on the left */
     .who {
-      display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 6px 14px;
-      padding: 12px 14px; margin: 0 0 22px;
+      margin: 0 0 22px; overflow: hidden;
       border: 1px solid var(--brand-line); border-radius: var(--radius-lg);
-      background: linear-gradient(135deg, #eef2ff 0%, #f0f9ff 100%);
+      background: #ffffff; box-shadow: inset 4px 0 0 var(--brand2);
     }
-    .who-label { display: block; font-size: 0.85rem; color: var(--muted); }
-    .who strong { font-size: 1.2rem; line-height: 1.25; color: var(--brand); }
-    .who-mail { font-size: 0.88rem; color: var(--muted); text-align: right; word-break: break-all; }
+    .who-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px 11px 18px; }
+    .who-row + .who-row { border-top: 1px solid #e4e8fb; }
+    .who-ic { flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: #e0e7ff; color: var(--brand); }
+    .who-ic svg { width: 18px; height: 18px; }
+    .who-txt { min-width: 0; }
+    .who-label { display: block; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+    .who strong { display: block; font-size: 1.05rem; font-weight: 700; line-height: 1.25; color: var(--brand); word-break: break-word; }
+    .who-mail { display: block; font-size: 0.86rem; font-weight: 600; line-height: 1.3; color: var(--ink, #0f172a); overflow-wrap: anywhere; }
 
     .loc-line {
       display: flex; align-items: flex-start; gap: 8px;
@@ -451,13 +456,19 @@
     </header>
 
     <div class="who">
-      <div>
-        <span class="who-label" data-i18n="vendorLabel"></span>
-        <strong id="whoVendor"></strong>
+      <div class="who-row">
+        <span class="who-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg></span>
+        <div class="who-txt">
+          <span class="who-label" data-i18n="vendorLabel"></span>
+          <strong id="whoVendor"></strong>
+        </div>
       </div>
-      <div class="who-mail">
-        <span class="who-label" data-i18n="pasterLabel"></span>
-        <span id="whoEmail"></span>
+      <div class="who-row">
+        <span class="who-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
+        <div class="who-txt">
+          <span class="who-label" data-i18n="pasterLabel"></span>
+          <span id="whoEmail" class="who-mail"></span>
+        </div>
       </div>
     </div>
     <p class="admin-note" id="adminNote" hidden></p>
@@ -585,7 +596,7 @@
   </div><!-- /layout -->
   </div><!-- /appView -->
 
-  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v24</span></p>
+  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v26</span></p>
 </main>
 
 <!-- Pop-up: location is off -->
