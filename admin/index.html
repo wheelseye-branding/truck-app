@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#1e3a8a">
   <title>Master Panel — WheelsEye Truck Branding</title>
   <!-- Link preview (WhatsApp, Telegram, Gmail…) -->
@@ -41,6 +41,7 @@
     #wait .spin { width: 38px; height: 38px; border: 4px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: s 0.9s linear infinite; }
     #wait a { color: #ffffff; font-size: 15px; }
     @keyframes s { to { transform: rotate(360deg); } }
+    html, body { touch-action: manipulation; }
   </style>
 </head>
 <body>
@@ -62,5 +63,6 @@
     setTimeout(function () { direct.hidden = false; }, 8000);
     frame.src = src;
   </script>
+<script>document.addEventListener("gesturestart",function(e){e.preventDefault();});document.addEventListener("touchmove",function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});</script>
 </body>
 </html>
