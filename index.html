@@ -649,7 +649,7 @@
   </div><!-- /layout -->
   </div><!-- /appView -->
 
-  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v31</span></p>
+  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v32</span></p>
 </main>
 
 <!-- Pop-up: location is off -->
@@ -911,6 +911,7 @@
                     'సమర్పించడానికి ఇంటర్నెట్ అవసరం. నెట్‌వర్క్ ఉన్న చోటికి వెళ్ళి "మళ్ళీ ప్రయత్నించండి" నొక్కండి — మీరు నింపిన సమాచారం, ఫోటో ఇక్కడే ఉంటాయి.',
                     'सबमिट करण्यासाठी इंटरनेट आवश्यक आहे. नेटवर्क असलेल्या ठिकाणी जाऊन "पुन्हा प्रयत्न करा" दाबा — भरलेली माहिती आणि फोटो इथेच राहतील.',
                     'জমা দিতে ইন্টারনেট দরকার। নেটওয়ার্ক আছে এমন জায়গায় গিয়ে "আবার চেষ্টা করুন" চাপুন — পূরণ করা তথ্য ও ছবি এখানেই থাকবে।'],
+    locImproving:  ['सही लोकेशन ले रहे हैं…', 'Getting an accurate location…', 'ನಿಖರ ಸ್ಥಳ ಪಡೆಯಲಾಗುತ್ತಿದೆ…', 'துல்லியமான இருப்பிடம் பெறப்படுகிறது…', 'ఖచ్చితమైన లొకేషన్ తీసుకుంటోంది…', 'अचूक लोकेशन घेतले जात आहे…', 'সঠিক লোকেশন নেওয়া হচ্ছে…'],
     locGetting:    ['लोकेशन ली जा रही है…', 'Getting location…', 'ಸ್ಥಳ ಪಡೆಯಲಾಗುತ್ತಿದೆ…', 'இருப்பிடம் பெறப்படுகிறது…', 'లొకేషన్ తీసుకుంటోంది…', 'लोकेशन घेतले जात आहे…', 'লোকেশন নেওয়া হচ্ছে…'],
     locNoBrowser:  ['यह ब्राउज़र लोकेशन सपोर्ट नहीं करता। लिंक को Chrome में खोलें।', 'This browser does not support location. Open the link in Chrome.',
                     'ಈ ಬ್ರೌಸರ್ ಸ್ಥಳವನ್ನು ಬೆಂಬಲಿಸುವುದಿಲ್ಲ. ಲಿಂಕ್ ಅನ್ನು Chrome ನಲ್ಲಿ ತೆರೆಯಿರಿ.', 'இந்த உலாவி இருப்பிடத்தை ஆதரிக்காது. இணைப்பை Chrome-ல் திறக்கவும்.',
@@ -1595,39 +1596,94 @@
     return t('locOff');
   }
 
-  // A live GPS watch runs while the form is open. If it gave a reading in the last 20 seconds,
-  // Location is ON right now → the submit check passes at once. Switching Location off stops the
-  // readings (and raises an error), so the check falls back to a fresh reading and fails.
-  var gpsWatch = { id: null, last: 0, pos: null };
+  /* ───── Location: quick first, accurate in the background ─────
+     • Every reading (GPS watch, a quick Wi-Fi/tower fix, a fresh GPS fix) goes into one short list.
+     • The stamp and the entry use the most accurate reading taken in the last few seconds.
+     • A reading counts as "good" at 50 m or better; if none is good yet, the app waits up to 20 s
+       for one, then uses the best it has (its accuracy is saved with the entry).
+     • Old or remembered positions are never saved: only readings taken right now. */
+  var GOOD_ACC = 50, FRESH_MS = 20000, WAIT_GOOD_MS = 20000;
+  var gpsWatch = { id: null, last: 0, pos: null, err: null, pre: 0 };
+  var gpsReads = [];                                  // [{ pos, at }]
+  function addRead(pos) {
+    if (!pos || !pos.coords) return;
+    var at = pos.timestamp && pos.timestamp <= Date.now() + 5000 ? pos.timestamp : Date.now();
+    gpsReads.push({ pos: pos, at: at });
+    var cut = Date.now() - 3 * 60000;
+    gpsReads = gpsReads.filter(function (r) { return r.at >= cut; }).slice(-40);
+    gpsWatch.err = null;
+    try { store('tb_lastpos', { lat: pos.coords.latitude, lng: pos.coords.longitude, t: Date.now() }); } catch (e) {}
+    // Ask for this spot's City / Pincode in advance (at most every 20 s), so the photo stamp is instant
+    if (!gpsWatch.pre || Date.now() - gpsWatch.pre > 20000) {
+      gpsWatch.pre = Date.now();
+      getAddress(pos.coords.latitude, pos.coords.longitude, 8000).catch(function () {});
+    }
+  }
+  function bestRead(maxAgeMs) {
+    var cut = Date.now() - maxAgeMs, best = null;
+    gpsReads.forEach(function (r) {
+      if (r.at < cut) return;
+      if (!best || (r.pos.coords.accuracy || 9e9) < (best.pos.coords.accuracy || 9e9)) best = r;
+    });
+    return best;
+  }
+  function accOf(r) { return r ? Math.round(r.pos.coords.accuracy || 0) : 0; }
+  function quickFix() {                                // Wi-Fi / tower: usually 1–2 s
+    if (!navigator.geolocation) return;
+    try {
+      navigator.geolocation.getCurrentPosition(addRead, function () {}, { enableHighAccuracy: false, maximumAge: 0, timeout: 6000 });
+    } catch (e) {}
+  }
+  function freshGps() {                                // one new GPS reading (the watch can be quiet when standing still)
+    if (!navigator.geolocation) return;
+    try {
+      navigator.geolocation.getCurrentPosition(addRead, function (err) { gpsWatch.err = err; }, { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
+    } catch (e) {}
+  }
   function startGpsWatch() {
     if (!navigator.geolocation || gpsWatch.id !== null) return;
+    // City name for the last place this phone was at — ready before the first reading if the paster hasn't moved far
+    try {
+      var lp = recall('tb_lastpos');
+      if (lp && Date.now() - lp.t < 12 * 3600000) getAddress(lp.lat, lp.lng, 8000).catch(function () {});
+    } catch (e) {}
+    quickFix();
     gpsWatch.id = navigator.geolocation.watchPosition(
-      function (pos) {
-        gpsWatch.last = Date.now(); gpsWatch.pos = pos;
-        // Ask for this spot's City / Pincode in advance (at most every 20 s), so the photo stamp is instant
-        if (!gpsWatch.pre || Date.now() - gpsWatch.pre > 20000) {
-          gpsWatch.pre = Date.now();
-          getAddress(pos.coords.latitude, pos.coords.longitude, 8000).catch(function () {});
-        }
-      },
-      function () { gpsWatch.last = 0; gpsWatch.pos = null; },
+      function (pos) { gpsWatch.last = Date.now(); gpsWatch.pos = pos; addRead(pos); },
+      function (err) { gpsWatch.last = 0; gpsWatch.pos = null; gpsWatch.err = err; },
       { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 }
     );
   }
   function locationIsLive() {
     if (gpsWatch.last && Date.now() - gpsWatch.last < 20000) return Promise.resolve();
+    if (bestRead(20000)) return Promise.resolve();
     return getPosition(true);
   }
 
-  // fresh = true → a live GPS reading right now, so a phone with Location switched off cannot pass
+  // fresh = true → only readings from the last 20 s (Location switched off cannot pass)
   function getPosition(fresh) {
-    // A live watch reading from the last 10 seconds is as good as a new one — and instant
-    if (fresh && gpsWatch.pos && Date.now() - gpsWatch.last < 10000) return Promise.resolve(gpsWatch.pos);
+    var maxAge = fresh ? FRESH_MS : 2 * 60000;
+    var now = bestRead(maxAge);
+    if (now && accOf(now) <= GOOD_ACC) return Promise.resolve(now.pos);          // good reading already here: instant
+    if (!navigator.geolocation) return Promise.reject('nobrowser');
+    startGpsWatch();
+    quickFix();
+    freshGps();
+    var t0 = Date.now();
+    if (now) setLocLine('', 'locImproving');
     return new Promise(function (resolve, reject) {
-      if (!navigator.geolocation) return reject('nobrowser');
-      navigator.geolocation.getCurrentPosition(resolve, reject, {
-        enableHighAccuracy: true, timeout: 20000, maximumAge: fresh ? 0 : 60000
-      });
+      (function poll() {
+        var b = bestRead(maxAge);
+        if (b && accOf(b) <= GOOD_ACC) return resolve(b.pos);
+        var err = gpsWatch.err;
+        if (!b && err && (err.code === 1 || err.code === 2) && Date.now() - t0 > 1500) return reject(err);   // Location off / denied
+        if (Date.now() - t0 >= WAIT_GOOD_MS) {
+          if (b) return resolve(b.pos);                 // best we could get; its accuracy goes with the entry
+          return reject(err || { code: 3 });
+        }
+        if (b) setLocLine('', 'locImproving');
+        setTimeout(poll, 300);
+      })();
     });
   }
 
@@ -1656,12 +1712,9 @@
         time: Date.now(),
         city: '', state: '', pincode: ''
       };
-      // For the photo stamp the place name is a must: wait up to 10 s, and try once more if it is empty
-      var ask = function () { return getAddress(l.lat, l.lng, fresh ? 10000 : 2500); };
-      return ask().then(function (a) {
-        if (fresh && navigator.onLine && !(a && (a.city || a.state || a.pincode))) return getAddress(l.lat, l.lng, 6000);
-        return a;
-      }).then(function (a) {
+      // Place name for the stamp: usually ready (asked in advance); wait at most 3 s, otherwise the stamp
+      // shows Lat/Long + time and the server fills City / State / Pincode in the sheet
+      return getAddress(l.lat, l.lng, 3000).then(function (a) {
         a = a || {};
         l.city = a.city || ''; l.state = a.state || ''; l.pincode = a.pincode || '';
         loc = l;
