@@ -648,7 +648,7 @@
   </div><!-- /layout -->
   </div><!-- /appView -->
 
-  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v28</span></p>
+  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v30</span></p>
 </main>
 
 <!-- Pop-up: location is off -->
@@ -954,6 +954,7 @@
     eLatest:       ['(नवीनतम {n} दिख रही हैं)', '(showing the latest {n})', '(ಇತ್ತೀಚಿನ {n} ತೋರಿಸಲಾಗಿದೆ)', '(சமீபத்திய {n} காட்டப்படுகிறது)', '(తాజా {n} చూపిస్తోంది)', '(नवीन {n} दाखवत आहे)', '(সর্বশেষ {n} দেখানো হচ্ছে)'],
     eMore:         ['और दिखाएँ ({n} और)', 'Show more ({n} more)', 'ಇನ್ನಷ್ಟು ತೋರಿಸಿ ({n})', 'மேலும் காட்டு ({n})', 'మరిన్ని చూపించు ({n})', 'आणखी दाखवा ({n})', 'আরও দেখান ({n})'],
     eNone:         ['इस समय की कोई एंट्री नहीं।', 'No entries for this period.', 'ಈ ಅವಧಿಗೆ ಯಾವುದೇ ಎಂಟ್ರಿ ಇಲ್ಲ.', 'இந்த காலத்திற்கு பதிவுகள் இல்லை.', 'ఈ కాలానికి ఎంట్రీలు లేవు.', 'या कालावधीत एंट्री नाही.', 'এই সময়ের কোনো এন্ট্রি নেই।'],
+    eUpdating:     ['अपडेट हो रहा है…', 'updating…', 'ನವೀಕರಿಸಲಾಗುತ್ತಿದೆ…', 'புதுப்பிக்கப்படுகிறது…', 'అప్‌డేట్ అవుతోంది…', 'अपडेट होत आहे…', 'আপডেট হচ্ছে…'],
     eDup:          ['दोबारा आई गाड़ी', 'Repeat vehicle', 'ಪುನರಾವರ್ತಿತ ವಾಹನ', 'மீண்டும் வந்த வாகனம்', 'మళ్ళీ వచ్చిన వాహనం', 'पुन्हा आलेली गाडी', 'আবার আসা গাড়ি'],
     totalEntries:  ['कुल एंट्री', 'Total entries', 'ಒಟ್ಟು ಎಂಟ್ರಿಗಳು', 'மொத்த பதிவுகள்', 'మొత్తం ఎంట్రీలు', 'एकूण एंट्री', 'মোট এন্ট্রি'],
     stickerPrefix: ['स्टिकर: ', 'Sticker: ', 'ಸ್ಟಿಕ್ಕರ್: ', 'ஸ்டிக்கர்: ', 'స్టిక్కర్: ', 'स्टिकर: ', 'স্টিকার: '],
@@ -1731,6 +1732,7 @@
       state.photoTime = file.lastModified || Date.now();
       state.photoLoc = l;
       state.photoData = encodeUnder(canvas, PHOTO_MAX_KB * 1024);
+      state.entryId = newId();                                   // a new photo is a new entry
       setInvalid('photo', false);
       el('photoPreview').src = state.photoData;
       el('photoOpen').hidden = true;
@@ -1928,7 +1930,7 @@
     }
 
     var entry = {
-      entryId: newId(),
+      entryId: state.entryId || (state.entryId = newId()),      // same photo → same ID, so a retry is never saved twice
       capturedAt: state.photoTime || Date.now(),
       accessCode: link.code,
       stickerType: ok.stickerType,
@@ -2116,6 +2118,7 @@
   el('againBtn').addEventListener('click', function () { resetForm(); });
 
   function resetForm() {
+    state.entryId = '';
     document.querySelectorAll('input[name="stickerType"]').forEach(function (r) { r.checked = false; });
     el('vehicle').value = '';
     el('vehicle').dispatchEvent(new Event('input'));
@@ -2153,6 +2156,7 @@
       if (saved) { report.data = saved; renderReport(); fillFilters(saved); }
     }
     el('repSub').textContent = t('loading');
+    entPrefetch();
     api('report', { kind: link.kind, code: link.code }).then(function (res) {
       report.data = res;
       store(key, res);
@@ -2162,7 +2166,7 @@
     }, function (err) {
       var msg = cleanError(err);
       if (err.server && msg.indexOf('LOGIN_REQUIRED') !== -1) return loginExpired(link.code);
-      if (err.server && msg.indexOf('LINK_INVALID') !== -1) return showLinkError('');
+      if (err.server && msg.indexOf('LINK_INVALID') !== -1) { if (typeof entForget === 'function') entForget(); return showLinkError(''); }
       if (!err.server && report.data) {
         el('repSub').textContent = t('offlineReport') + ' · ' + t('updated', { t: report.data.updated });
         return;
@@ -2171,45 +2175,110 @@
     });
   }
 
-  el('repRefresh').addEventListener('click', function () { loadReport(); if (!el('repEntries').hidden) entLoad(); });
+  el('repRefresh').addEventListener('click', function () { loadReport(); if (!el('repEntries').hidden) entLoad(true); });
 
   /* ───── Entries (photos): newest first, 20 at a time, small photos loaded only when on screen ───── */
   var ent = { range: 'today', rows: [], total: 0, shown: 0, seq: 0, loaded: false };
   function ymd(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  /* "Now" as a calendar date in India time (the server counts days in IST, whatever the phone's zone) */
+  function istNow() {
+    try { return new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })); } catch (e) { return new Date(); }
+  }
   function entRange() {
-    var d = new Date(), from, to = ymd(d);
+    var d = istNow(), from, to = ymd(d);
     if (ent.range === 'yesterday') { d.setDate(d.getDate() - 1); from = to = ymd(d); }
-    else if (ent.range === 'week') { var m = new Date(); m.setDate(m.getDate() - ((m.getDay() + 6) % 7)); from = ymd(m); }
+    else if (ent.range === 'week') { var m = istNow(); m.setDate(m.getDate() - ((m.getDay() + 6) % 7)); from = ymd(m); }
     else if (ent.range === 'month') { from = ymd(new Date(d.getFullYear(), d.getMonth(), 1)); }
     else if (ent.range === 'pick') { from = el('entFrom').value || to; to = el('entTo').value || from; if (to < from) { var x = from; from = to; to = x; } }
     else from = to;
     return { from: from, to: to };
   }
-  function entLoad() {
-    var rg = entRange(), my = ++ent.seq;
-    ent.loaded = true;
-    el('entCount').textContent = t('loading');
+  /* Saved on the phone per period, so a period opens at once; then refreshed quietly in the background.
+     Finished periods (yesterday, past dates) don't change, so they are not fetched again unless Refresh. */
+  var ENT_KEEP = 14;
+  function entKey(rg) { return 'tb_ent_' + link.kind + '_' + link.code + '_' + rg.from + '_' + rg.to; }
+  function entSave(key, data) {
+    store(key, { rows: data.rows, total: data.total, at: Date.now() });
+    var keys = (recall('tb_ent_keys') || []).filter(function (k) { return k !== key; });
+    keys.unshift(key);
+    keys.slice(ENT_KEEP).forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
+    store('tb_ent_keys', keys.slice(0, ENT_KEEP));
+  }
+  /* Was this copy saved after the day "to" had ended in India? (+5 min for entries still on their way) */
+  function entFinal(hit, to) {
+    var endIst = new Date(to + 'T00:00:00+05:30').getTime() + 86400000 + 5 * 60000;
+    return (hit.at || 0) > endIst;
+  }
+  function entForget() {
+    (recall('tb_ent_keys') || []).forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
+    try { localStorage.removeItem('tb_ent_keys'); } catch (e) {}
+  }
+  function entSame(a, b) {
+    if (!a || !b || a.total !== b.total || (a.rows || []).length !== (b.rows || []).length) return false;
+    var f = function (x) { return x && x.rows && x.rows.length ? (x.rows[0].time + x.rows[0].photo + x.rows[x.rows.length - 1].photo) : ''; };
+    return f(a) === f(b);
+  }
+  function entShow(data, updating, keepShown) {
+    ent.rows = (data.rows || []).filter(function (r) { return r.photo || r.vehicle; });
+    ent.total = data.total || ent.rows.length;
+    var was = keepShown ? ent.shown : 0;
+    ent.shown = 0;
+    var large = 0, small = 0;
+    ent.rows.forEach(function (r) { var st = String(r.sticker || '').toLowerCase(); if (st.indexOf('large') === 0) large++; else if (st.indexOf('small') === 0) small++; });
+    var c = el('entCount');
+    c.innerHTML = '';
+    var lbl = el('entChips').querySelector('[aria-pressed="true"]');
+    c.appendChild(document.createTextNode((lbl ? lbl.textContent : '') + ': '));
+    var b = document.createElement('b'); b.textContent = t('eCount', { n: ent.total }); c.appendChild(b);
+    c.appendChild(document.createTextNode(' · Large ' + large + ' · Small ' + small + (ent.total > ent.rows.length ? ' ' + t('eLatest', { n: ent.rows.length }) : '')));
+    if (updating) { var u = document.createElement('span'); u.id = 'entUpd'; u.textContent = ' · ' + t('eUpdating'); c.appendChild(u); }
     el('entList').innerHTML = '';
     el('entMore').hidden = true;
-    api('rows', { kind: link.kind, code: link.code, q: { from: rg.from, to: rg.to, q: el('entSearch').value.trim() } }).then(function (res) {
+    if (!ent.rows.length) { var p = document.createElement('p'); p.className = 'sub'; p.textContent = t('eNone'); el('entList').appendChild(p); return; }
+    entMore();
+    while (ent.shown < was && ent.shown < ent.rows.length) entMore();
+  }
+  function entLoad(force) {
+    var rg = entRange(), q = el('entSearch').value.trim(), my = ++ent.seq;
+    var key = entKey(rg), today = ymd(istNow());
+    var hit = q ? null : recall(key);
+    ent.loaded = true;
+    if (hit) entShow(hit, true, false);                       // 1) show what the phone has, at once
+    else { el('entCount').textContent = t('loading'); el('entList').innerHTML = ''; el('entMore').hidden = true; }
+    // A finished period is trusted without asking the server only if it was saved after that period
+    // ended (IST) and less than 30 minutes ago — so late entries and sheet corrections still come through.
+    if (hit && rg.to < today && force !== true && entFinal(hit, rg.to) && Date.now() - (hit.at || 0) < 30 * 60000) {
+      var u = el('entUpd'); if (u) u.remove();
+      return;
+    }
+    api('rows', { kind: link.kind, code: link.code, q: { from: rg.from, to: rg.to, q: q } }).then(function (res) {   // 2) refresh quietly
       if (my !== ent.seq) return;
-      ent.rows = (res.rows || []).filter(function (r) { return r.photo || r.vehicle; });
-      ent.total = res.total || ent.rows.length;
-      ent.shown = 0;
-      var large = 0, small = 0;
-      ent.rows.forEach(function (r) { var st = String(r.sticker || '').toLowerCase(); if (st.indexOf('large') === 0) large++; else if (st.indexOf('small') === 0) small++; });
-      el('entCount').innerHTML = '';
-      var lbl = el('entChips').querySelector('[aria-pressed="true"]');
-      el('entCount').appendChild(document.createTextNode((lbl ? lbl.textContent : '') + ': '));
-      var b = document.createElement('b'); b.textContent = t('eCount', { n: ent.total }); el('entCount').appendChild(b);
-      el('entCount').appendChild(document.createTextNode(' · Large ' + large + ' · Small ' + small + (ent.total > ent.rows.length ? ' ' + t('eLatest', { n: ent.rows.length }) : '')));
-      if (!ent.rows.length) { var p = document.createElement('p'); p.className = 'sub'; p.textContent = t('eNone'); el('entList').appendChild(p); return; }
-      entMore();
+      var data = { rows: res.rows || [], total: res.total || 0 };
+      if (!q) entSave(key, data);
+      if (hit && entSame(hit, data)) { var u = el('entUpd'); if (u) u.remove(); return; }
+      entShow(data, false, !!hit);
     }, function (err) {
       if (my !== ent.seq) return;
       var msg = cleanError(err);
       if (err.server && msg.indexOf('LOGIN_REQUIRED') !== -1) return loginExpired(link.code);
+      if (err.server && msg.indexOf('LINK_INVALID') !== -1) { entForget(); return showLinkError(''); }
+      if (hit) { var u = el('entUpd'); if (u) u.textContent = ' · ' + t('offlineData'); return; }
       el('entCount').textContent = err.server ? t('reportFail') + msg : t('offlineData');
+    });
+  }
+  /* Today and yesterday fetched in the background when the report opens, so the first tap is instant */
+  function entPrefetch() {
+    if (!navigator.onLine || !link || !link.code) return;
+    var d = istNow(), today = ymd(d); d.setDate(d.getDate() - 1); var yest = ymd(d);
+    [[today, today], [yest, yest]].forEach(function (p, k) {
+      var key = 'tb_ent_' + link.kind + '_' + link.code + '_' + p[0] + '_' + p[1];
+      var hit = recall(key);
+      if (hit && Date.now() - (hit.at || 0) < 60000) return;
+      if (hit && p[1] < today && entFinal(hit, p[1]) && Date.now() - (hit.at || 0) < 30 * 60000) return;
+      setTimeout(function () {
+        api('rows', { kind: link.kind, code: link.code, q: { from: p[0], to: p[1], q: '' } })
+          .then(function (res) { entSave(key, { rows: res.rows || [], total: res.total || 0 }); }, function () {});
+      }, 600 + k * 900);
     });
   }
   function entMore() {
@@ -2265,7 +2334,7 @@
       ent.range = b.getAttribute('data-r');
       document.querySelectorAll('#entChips button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
       el('entDates').hidden = ent.range !== 'pick';
-      if (ent.range === 'pick' && !el('entFrom').value) { el('entFrom').value = ymd(new Date()); el('entTo').value = ymd(new Date()); }
+      if (ent.range === 'pick' && !el('entFrom').value) { el('entFrom').value = ymd(istNow()); el('entTo').value = ymd(istNow()); }
       entLoad();
     });
   });
