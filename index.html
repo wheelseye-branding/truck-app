@@ -2,7 +2,7 @@
 <html lang="hi">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#1e3a8a">
   <title>WheelsEye Truck Branding</title>
   <!-- Link preview (WhatsApp, Telegram, Gmail…) -->
@@ -118,6 +118,31 @@
 
     /* Report */
     .rep-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    /* Counts | Entries (photos) */
+    .vseg { display: flex; width: 100%; max-width: 520px; padding: 4px; margin: 12px 0 4px; border-radius: 14px; background: #eef2ff; }
+    .vseg button { flex: 1; border: 0; background: transparent; padding: 9px 8px; border-radius: 10px; font: inherit; font-weight: 700; color: var(--brand); cursor: pointer; }
+    .vseg button[aria-selected="true"] { background: var(--brand); color: #fff; }
+    .ent-chips { display: flex; gap: 8px; overflow-x: auto; margin: 10px 0; padding-bottom: 2px; scrollbar-width: none; }
+    .ent-chips::-webkit-scrollbar { display: none; }
+    .ent-chips button { flex: 0 0 auto; border: 1px solid #c7d2fe; background: #fff; color: var(--brand); border-radius: 999px; padding: 7px 13px; font: inherit; font-size: 0.9rem; font-weight: 700; cursor: pointer; }
+    .ent-chips button[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+    .ent-dates { display: flex; gap: 8px; margin-bottom: 10px; } .ent-dates input { flex: 1; min-width: 0; }
+    .ent-search { width: 100%; box-sizing: border-box; margin-bottom: 8px; padding: 11px 14px; border: 2px solid #c7d2fe; border-radius: 12px; font: inherit; font-size: 0.95rem; background: #fff; color: var(--ink); -webkit-appearance: none; appearance: none; }
+    .ent-search:focus { outline: none; border-color: #4f46e5; }
+    .ent-count { font-size: 0.88rem; color: var(--muted); margin: 2px 2px 10px; } .ent-count b { color: var(--brand); }
+    .ent-card { display: flex; gap: 12px; align-items: stretch; width: 100%; text-align: left; padding: 10px; border: 1px solid #e4e8fb; border-radius: 16px; margin-bottom: 8px; background: #fff; font: inherit; color: inherit; cursor: pointer; }
+    .ent-ph { flex: none; width: 92px; height: 72px; border-radius: 10px; background: #1f2937; overflow: hidden; display: grid; place-items: center; color: #94a3b8; font-size: 1.4rem; }
+    .ent-ph { position: relative; }
+    .ent-ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity .2s; }
+    .ent-ph img.ok { opacity: 1; }
+    .ent-info { flex: 1; min-width: 0; }
+    .ent-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .ent-plate { background: #f5c518; border: 1.5px solid #111; border-radius: 6px; padding: 1px 8px; font-weight: 800; letter-spacing: 0.04em; font-size: 0.92rem; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ent-tm { color: var(--muted); font-size: 0.82rem; white-space: nowrap; }
+    .ent-l2 { margin-top: 6px; font-size: 0.85rem; color: var(--muted); line-height: 1.4; overflow-wrap: anywhere; }
+    .ent-l2 b { color: var(--ink); font-weight: 700; }
+    .ent-dup { display: inline-block; margin-top: 4px; font-size: 0.75rem; font-weight: 700; color: #b45309; background: #fef3c7; border-radius: 6px; padding: 1px 6px; }
+    .ent-more { width: 100%; margin-top: 4px; }
     .rep-head h2 { margin: 0; font-size: 1.25rem; color: var(--brand); }
     .seg { display: flex; width: 100%; max-width: 520px; padding: 4px; margin: 14px 0 12px; border-radius: 999px; background: var(--brand-soft); }
     .seg button {
@@ -348,6 +373,11 @@
     .pview .round { width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,0.16); color: #ffffff; font-size: 1.5rem; line-height: 1; cursor: pointer; }
     .pview .pimg { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 6px; color: #cbd5e1; text-align: center; }
     .pview .pimg img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; }
+    /* Page never zooms on phones; the photo box handles its own pinch / double-tap zoom */
+    html { touch-action: manipulation; }
+    .zoombox { touch-action: none; overflow: hidden; }
+    .zoombox img { transform-origin: center center; will-change: transform; user-select: none; -webkit-user-drag: none; }
+
     .pview .pfoot { display: flex; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)); }
     .pview .pfoot > * { flex: 1; min-height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 700; text-decoration: none; }
     .pview .pfoot .nav { border: 1px solid rgba(255,255,255,0.35); background: transparent; color: #ffffff; font-family: inherit; font-size: 1.2rem; cursor: pointer; }
@@ -570,6 +600,27 @@
       </div>
       <p class="sub" id="repSub" style="margin:4px 0 0"></p>
 
+      <div class="vseg" role="tablist" id="repViews">
+        <button type="button" role="tab" data-v="counts" aria-selected="true" data-i18n="viewCounts"></button>
+        <button type="button" role="tab" data-v="entries" aria-selected="false" data-i18n="viewEntries"></button>
+      </div>
+
+      <div id="repEntries" hidden>
+        <div class="ent-chips" id="entChips">
+          <button type="button" data-r="today" aria-pressed="true" data-i18n="today"></button>
+          <button type="button" data-r="yesterday" aria-pressed="false" data-i18n="eYesterday"></button>
+          <button type="button" data-r="week" aria-pressed="false" data-i18n="eWeek"></button>
+          <button type="button" data-r="month" aria-pressed="false" data-i18n="eMonth"></button>
+          <button type="button" data-r="pick" aria-pressed="false" data-i18n="ePick"></button>
+        </div>
+        <div class="ent-dates" id="entDates" hidden><input type="date" id="entFrom"><input type="date" id="entTo"></div>
+        <input type="search" class="ent-search" id="entSearch" autocomplete="off">
+        <p class="ent-count" id="entCount"></p>
+        <div id="entList"></div>
+        <button type="button" class="fbtn ent-more" id="entMore" hidden></button>
+      </div>
+
+      <div id="repCounts">
       <div class="seg" role="tablist">
         <button type="button" role="tab" data-g="day" aria-selected="true" data-i18n="dayWise"></button>
         <button type="button" role="tab" data-g="week" aria-selected="false" data-i18n="weekWise"></button>
@@ -591,12 +642,13 @@
           <button type="button" class="fbtn" id="fShow" data-i18n="showData"></button>
         </div>
       </div>
+      </div><!-- /repCounts -->
     </section>
   </div><!-- /reportPane -->
   </div><!-- /layout -->
   </div><!-- /appView -->
 
-  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v26</span></p>
+  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v28</span></p>
 </main>
 
 <!-- Pop-up: location is off -->
@@ -633,7 +685,7 @@
   <div class="pimg" id="pImg"></div>
   <div class="pfoot">
     <button type="button" class="nav" id="pPrev" aria-label="Previous">‹</button>
-    <a class="dl" id="pDl" href="#" target="_blank" rel="noopener" data-i18n="download"></a>
+    <a class="dl" id="pDl" href="#" target="_blank" rel="noopener" data-i18n="dlPhoto"></a>
     <button type="button" class="nav" id="pNext" aria-label="Next">›</button>
   </div>
 </div>
@@ -847,7 +899,7 @@
     videoSaveFail: ['वीडियो सेव नहीं हो सका। कृपया दोबारा रिकॉर्ड करें।', 'Could not save the video. Please record again.', 'ವೀಡಿಯೊ ಉಳಿಸಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ರೆಕಾರ್ಡ್ ಮಾಡಿ.',
                     'வீடியோவைச் சேமிக்க முடியவில்லை. மீண்டும் பதிவு செய்யவும்.', 'వీడియో సేవ్ కాలేదు. మళ్ళీ రికార్డ్ చేయండి.', 'व्हिडिओ सेव्ह झाला नाही. पुन्हा रेकॉर्ड करा.', 'ভিডিও সেভ করা যায়নি। আবার রেকর্ড করুন।'],
     locChecking:   ['लोकेशन जाँच रहे हैं…', 'Checking location…', 'ಸ್ಥಳ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ…', 'இருப்பிடம் சரிபார்க்கப்படுகிறது…', 'లొకేషన్ తనిఖీ చేస్తోంది…', 'लोकेशन तपासत आहोत…', 'লোকেশন যাচাই করা হচ্ছে…'],
-    download:      ['डाउनलोड', 'Download', 'ಡೌನ್‌ಲೋಡ್', 'பதிவிறக்கு', 'డౌన్‌లోడ్', 'डाउनलोड', 'ডাউনলোড'],
+    dlPhoto:       ['फ़ोटो डाउनलोड', 'Download photo', 'ಫೋಟೋ ಡೌನ್‌ಲೋಡ್', 'புகைப்படம் பதிவிறக்கு', 'ఫోటో డౌన్‌లోడ్', 'फोटो डाउनलोड', 'ছবি ডাউনলোড'],
     photoLoading:  ['फ़ोटो खुल रही है…', 'Opening photo…', 'ಫೋಟೋ ತೆರೆಯುತ್ತಿದೆ…', 'புகைப்படம் திறக்கிறது…', 'ఫోటో తెరుస్తోంది…', 'फोटो उघडत आहे…', 'ছবি খুলছে…'],
     photoFail:     ['फ़ोटो यहाँ नहीं दिखी — "डाउनलोड" दबाएँ।', 'The photo did not show here — tap "Download".', 'ಫೋಟೋ ಇಲ್ಲಿ ಕಾಣಲಿಲ್ಲ — "ಡೌನ್‌ಲೋಡ್" ಒತ್ತಿ.', 'புகைப்படம் இங்கே தெரியவில்லை — "பதிவிறக்கு" அழுத்தவும்.', 'ఫోటో ఇక్కడ కనిపించలేదు — "డౌన్‌లోడ్" నొక్కండి.', 'फोटो इथे दिसला नाही — "डाउनलोड" दाबा.', 'ছবি এখানে দেখা যায়নি — "ডাউনলোড" চাপুন।'],
     netTitle:      ['इंटरनेट नहीं है', 'No internet', 'ಇಂಟರ್ನೆಟ್ ಇಲ್ಲ', 'இணையம் இல்லை', 'ఇంటర్నెట్ లేదు', 'इंटरनेट नाही', 'ইন্টারনেট নেই'],
@@ -890,6 +942,19 @@
     overall:       ['कुल', 'Overall', 'ಒಟ್ಟಾರೆ', 'மொத்தம்', 'మొత్తం', 'एकूण', 'সামগ্রিক'],
     monthWise:     ['महीना-वार', 'Month-wise', 'ತಿಂಗಳುವಾರು', 'மாதம் வாரியாக', 'నెలవారీ', 'महिनानिहाय', 'মাস অনুযায়ী'],
     today:         ['आज', 'Today', 'ಇಂದು', 'இன்று', 'ఈరోజు', 'आज', 'আজ'],
+    viewCounts:    ['गिनती', 'Counts', 'ಎಣಿಕೆ', 'எண்ணிக்கை', 'లెక్కలు', 'मोजणी', 'গণনা'],
+    viewEntries:   ['एंट्री (फ़ोटो)', 'Entries (photos)', 'ಎಂಟ್ರಿಗಳು (ಫೋಟೋ)', 'பதிவுகள் (புகைப்படம்)', 'ఎంట్రీలు (ఫోటో)', 'एंट्री (फोटो)', 'এন্ট্রি (ছবি)'],
+    eYesterday:    ['कल', 'Yesterday', 'ನಿನ್ನೆ', 'நேற்று', 'నిన్న', 'काल', 'গতকাল'],
+    eWeek:         ['इस हफ़्ते', 'This week', 'ಈ ವಾರ', 'இந்த வாரம்', 'ఈ వారం', 'या आठवड्यात', 'এই সপ্তাহে'],
+    eMonth:        ['इस महीने', 'This month', 'ಈ ತಿಂಗಳು', 'இந்த மாதம்', 'ఈ నెల', 'या महिन्यात', 'এই মাসে'],
+    ePick:         ['तारीख चुनें', 'Pick dates', 'ದಿನಾಂಕ ಆಯ್ಕೆ', 'தேதி தேர்வு', 'తేదీలు ఎంచుకోండి', 'तारीख निवडा', 'তারিখ বাছুন'],
+    eSearchP:      ['🔍 गाड़ी नंबर खोजें', '🔍 Search vehicle number', '🔍 ವಾಹನ ಸಂಖ್ಯೆ ಹುಡುಕಿ', '🔍 வாகன எண் தேடுக', '🔍 వాహన నంబర్ వెతకండి', '🔍 गाडी नंबर शोधा', '🔍 গাড়ি নম্বর খুঁজুন'],
+    eSearchV:      ['🔍 गाड़ी नंबर / पेस्टर खोजें', '🔍 Search vehicle / paster', '🔍 ವಾಹನ / ಪೇಸ್ಟರ್ ಹುಡುಕಿ', '🔍 வாகனம் / பேஸ்டர் தேடுக', '🔍 వాహనం / పేస్టర్ వెతకండి', '🔍 गाडी / पेस्टर शोधा', '🔍 গাড়ি / পেস্টার খুঁজুন'],
+    eCount:        ['{n} एंट्री', '{n} entries', '{n} ಎಂಟ್ರಿಗಳು', '{n} பதிவுகள்', '{n} ఎంట్రీలు', '{n} एंट्री', '{n}টি এন্ট্রি'],
+    eLatest:       ['(नवीनतम {n} दिख रही हैं)', '(showing the latest {n})', '(ಇತ್ತೀಚಿನ {n} ತೋರಿಸಲಾಗಿದೆ)', '(சமீபத்திய {n} காட்டப்படுகிறது)', '(తాజా {n} చూపిస్తోంది)', '(नवीन {n} दाखवत आहे)', '(সর্বশেষ {n} দেখানো হচ্ছে)'],
+    eMore:         ['और दिखाएँ ({n} और)', 'Show more ({n} more)', 'ಇನ್ನಷ್ಟು ತೋರಿಸಿ ({n})', 'மேலும் காட்டு ({n})', 'మరిన్ని చూపించు ({n})', 'आणखी दाखवा ({n})', 'আরও দেখান ({n})'],
+    eNone:         ['इस समय की कोई एंट्री नहीं।', 'No entries for this period.', 'ಈ ಅವಧಿಗೆ ಯಾವುದೇ ಎಂಟ್ರಿ ಇಲ್ಲ.', 'இந்த காலத்திற்கு பதிவுகள் இல்லை.', 'ఈ కాలానికి ఎంట్రీలు లేవు.', 'या कालावधीत एंट्री नाही.', 'এই সময়ের কোনো এন্ট্রি নেই।'],
+    eDup:          ['दोबारा आई गाड़ी', 'Repeat vehicle', 'ಪುನರಾವರ್ತಿತ ವಾಹನ', 'மீண்டும் வந்த வாகனம்', 'మళ్ళీ వచ్చిన వాహనం', 'पुन्हा आलेली गाडी', 'আবার আসা গাড়ি'],
     totalEntries:  ['कुल एंट्री', 'Total entries', 'ಒಟ್ಟು ಎಂಟ್ರಿಗಳು', 'மொத்த பதிவுகள்', 'మొత్తం ఎంట్రీలు', 'एकूण एंट्री', 'মোট এন্ট্রি'],
     stickerPrefix: ['स्टिकर: ', 'Sticker: ', 'ಸ್ಟಿಕ್ಕರ್: ', 'ஸ்டிக்கர்: ', 'స్టిక్కర్: ', 'स्टिकर: ', 'স্টিকার: '],
     pasterWise:    ['पेस्टर-वार', 'Paster-wise', 'ಪೇಸ್ಟರ್‌ವಾರು', 'பேஸ்டர் வாரியாக', 'పేస్టర్‌వారీ', 'पेस्टरनिहाय', 'পেস্টার অনুযায়ী'],
@@ -1051,6 +1116,10 @@
     if (lastLocErr !== null) el('locModalReason').textContent = locationErrorText(lastLocErr);
     if (typeof loginState !== 'undefined' && loginState && loginState.res) { renderLoginText(); renderGoogleButton(); }
     if (typeof link !== 'undefined' && link && link.filledBy) el('adminNote').textContent = t('adminFill', { admin: link.filledBy });
+    if (typeof link !== 'undefined' && link && el('entSearch')) {
+      el('entSearch').placeholder = t(link.kind === 'v' ? 'eSearchV' : 'eSearchP');
+      if (typeof ent !== 'undefined' && ent.loaded && !el('repEntries').hidden) entLoad();
+    }
     if (typeof state !== 'undefined' && state && state.up) renderPhotoUp();
   }
 
@@ -1071,8 +1140,67 @@
     applyLang();
   })();
 
+  /* ───── Phones: the page never zooms; only the photo in the viewer does ───── */
+  document.addEventListener('gesturestart', function (e) { e.preventDefault(); });          // iPhone pinch
+  document.addEventListener('touchmove', function (e) {
+    if (e.touches && e.touches.length > 1 && !(e.target.closest && e.target.closest('.zoombox'))) e.preventDefault();
+  }, { passive: false });
+  /* Pinch (1×–4×), double-tap (1× ↔ 2.5×) and drag for the photo in a viewer box */
+  function zoomer(box) {
+    box.classList.add('zoombox');
+    var z = { s: 1, x: 0, y: 0, pinchAt: 0 }, st = null, lastTap = 0;
+    function im() { return box.querySelector('img'); }
+    function apply() {
+      var i = im();
+      if (i) i.style.transform = 'translate(' + z.x + 'px,' + z.y + 'px) scale(' + z.s + ')';
+      box.classList.toggle('zoomed', z.s > 1.01);
+    }
+    function clamp() {
+      var i = im(); if (!i) return;
+      var w = i.offsetWidth * (z.s - 1) / 2, h = i.offsetHeight * (z.s - 1) / 2;
+      z.x = Math.max(-w, Math.min(w, z.x)); z.y = Math.max(-h, Math.min(h, z.y));
+    }
+    function reset() { z.s = 1; z.x = 0; z.y = 0; apply(); }
+    function dist(t) { return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY); }
+    box.addEventListener('touchstart', function (e) {
+      if (!im()) return;
+      if (e.touches.length === 2) { st = { d: dist(e.touches), s: z.s }; z.pinchAt = Date.now(); return; }
+      if (e.touches.length !== 1) return;
+      var now = Date.now(), t = e.touches[0];
+      if (now - lastTap < 300) {                                  // double tap
+        e.preventDefault();
+        if (z.s > 1.01) reset();
+        else { z.s = 2.5; z.x = 0; z.y = 0; apply(); }
+        lastTap = 0; z.pinchAt = now; st = null; return;
+      }
+      lastTap = now;
+      st = { px: t.clientX, py: t.clientY, x: z.x, y: z.y };
+    }, { passive: false });
+    box.addEventListener('touchmove', function (e) {
+      if (!st) return;
+      if (e.touches.length === 2 && st.d) {
+        e.preventDefault();
+        z.s = Math.max(1, Math.min(4, st.s * dist(e.touches) / st.d));
+        z.pinchAt = Date.now(); clamp(); apply();
+      } else if (e.touches.length === 1 && z.s > 1.01 && st.px !== undefined) {
+        e.preventDefault();
+        z.x = st.x + (e.touches[0].clientX - st.px); z.y = st.y + (e.touches[0].clientY - st.py);
+        clamp(); apply();
+      }
+    }, { passive: false });
+    box.addEventListener('touchend', function (e) {
+      if (e.touches.length === 0) { st = null; if (z.s < 1.05) reset(); }
+      else if (e.touches.length === 1) { var t = e.touches[0]; st = { px: t.clientX, py: t.clientY, x: z.x, y: z.y }; }
+    });
+    return {
+      reset: reset,
+      busy: function () { return z.s > 1.01 || Date.now() - z.pinchAt < 450; }   // no page-swipe while zoomed / just pinched
+    };
+  }
+
   /* ───── Photo viewer: Drive photo shown inside the app ───── */
   var pv = { list: [], i: 0 };
+  var pZoom = null;
   function driveId(u) {
     var m = /\/d\/([^/?#]+)/.exec(u || '') || /[?&]id=([^&#]+)/.exec(u || '');
     return m ? m[1] : '';
@@ -1086,6 +1214,8 @@
     el('pCount').textContent = (pv.i + 1) + ' / ' + pv.list.length;
     el('pDl').href = id ? 'https://drive.google.com/uc?export=download&id=' + encodeURIComponent(id) : (r.photo || '#');
     var box = el('pImg');
+    if (!pZoom) pZoom = zoomer(box);
+    pZoom.reset();
     box.textContent = t('photoLoading');
     if (id) {
       var img = new Image();
@@ -1109,6 +1239,7 @@
       if (x0 === null) return;
       var p = e.changedTouches[0], dx = p.clientX - x0, dy = p.clientY - y0;
       x0 = null;
+      if (pZoom && pZoom.busy()) return;                   // zoomed in: the finger moves the photo, not the page
       if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return;
       openPhoto(null, pv.i + (dx < 0 ? 1 : -1));          // swipe left = next, right = previous
     });
@@ -2040,7 +2171,108 @@
     });
   }
 
-  el('repRefresh').addEventListener('click', loadReport);
+  el('repRefresh').addEventListener('click', function () { loadReport(); if (!el('repEntries').hidden) entLoad(); });
+
+  /* ───── Entries (photos): newest first, 20 at a time, small photos loaded only when on screen ───── */
+  var ent = { range: 'today', rows: [], total: 0, shown: 0, seq: 0, loaded: false };
+  function ymd(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  function entRange() {
+    var d = new Date(), from, to = ymd(d);
+    if (ent.range === 'yesterday') { d.setDate(d.getDate() - 1); from = to = ymd(d); }
+    else if (ent.range === 'week') { var m = new Date(); m.setDate(m.getDate() - ((m.getDay() + 6) % 7)); from = ymd(m); }
+    else if (ent.range === 'month') { from = ymd(new Date(d.getFullYear(), d.getMonth(), 1)); }
+    else if (ent.range === 'pick') { from = el('entFrom').value || to; to = el('entTo').value || from; if (to < from) { var x = from; from = to; to = x; } }
+    else from = to;
+    return { from: from, to: to };
+  }
+  function entLoad() {
+    var rg = entRange(), my = ++ent.seq;
+    ent.loaded = true;
+    el('entCount').textContent = t('loading');
+    el('entList').innerHTML = '';
+    el('entMore').hidden = true;
+    api('rows', { kind: link.kind, code: link.code, q: { from: rg.from, to: rg.to, q: el('entSearch').value.trim() } }).then(function (res) {
+      if (my !== ent.seq) return;
+      ent.rows = (res.rows || []).filter(function (r) { return r.photo || r.vehicle; });
+      ent.total = res.total || ent.rows.length;
+      ent.shown = 0;
+      var large = 0, small = 0;
+      ent.rows.forEach(function (r) { var st = String(r.sticker || '').toLowerCase(); if (st.indexOf('large') === 0) large++; else if (st.indexOf('small') === 0) small++; });
+      el('entCount').innerHTML = '';
+      var lbl = el('entChips').querySelector('[aria-pressed="true"]');
+      el('entCount').appendChild(document.createTextNode((lbl ? lbl.textContent : '') + ': '));
+      var b = document.createElement('b'); b.textContent = t('eCount', { n: ent.total }); el('entCount').appendChild(b);
+      el('entCount').appendChild(document.createTextNode(' · Large ' + large + ' · Small ' + small + (ent.total > ent.rows.length ? ' ' + t('eLatest', { n: ent.rows.length }) : '')));
+      if (!ent.rows.length) { var p = document.createElement('p'); p.className = 'sub'; p.textContent = t('eNone'); el('entList').appendChild(p); return; }
+      entMore();
+    }, function (err) {
+      if (my !== ent.seq) return;
+      var msg = cleanError(err);
+      if (err.server && msg.indexOf('LOGIN_REQUIRED') !== -1) return loginExpired(link.code);
+      el('entCount').textContent = err.server ? t('reportFail') + msg : t('offlineData');
+    });
+  }
+  function entMore() {
+    var list = el('entList'), end = Math.min(ent.rows.length, ent.shown + 20);
+    for (var i = ent.shown; i < end; i++) list.appendChild(entCard(ent.rows[i], i));
+    ent.shown = end;
+    var left = ent.rows.length - ent.shown;
+    el('entMore').hidden = left <= 0;
+    el('entMore').textContent = t('eMore', { n: Math.min(20, left) });
+  }
+  function entCard(r, i) {
+    var c = document.createElement('button');
+    c.type = 'button'; c.className = 'ent-card';
+    var ph = document.createElement('span'); ph.className = 'ent-ph';
+    var cam = document.createElement('span'); cam.className = 'ent-cam'; cam.textContent = '📷';
+    ph.appendChild(cam);
+    var id = driveId(r.photo);
+    if (id) {
+      // In the page from the start (so "lazy" can load it when it scrolls into view), shown once loaded
+      var img = new Image();
+      img.loading = 'lazy'; img.decoding = 'async'; img.alt = r.vehicle || ''; img.referrerPolicy = 'no-referrer';
+      img.onload = function () { img.classList.add('ok'); cam.remove(); };
+      img.onerror = function () { img.remove(); };
+      img.src = 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w240';
+      ph.appendChild(img);
+    }
+    var info = document.createElement('span'); info.className = 'ent-info';
+    var top = document.createElement('span'); top.className = 'ent-top';
+    var plate = document.createElement('span'); plate.className = 'ent-plate'; plate.textContent = r.vehicle || '—';
+    var tm = document.createElement('span'); tm.className = 'ent-tm';
+    var when = String(r.time || '');
+    tm.textContent = ent.range === 'today' || ent.range === 'yesterday' ? when.slice(-5) : when.replace(/-\d{4} /, ' ');
+    top.appendChild(plate); top.appendChild(tm);
+    var l2 = document.createElement('span'); l2.className = 'ent-l2';
+    if (link.kind === 'v' && r.paster) { var b = document.createElement('b'); b.textContent = r.paster; l2.appendChild(b); l2.appendChild(document.createElement('br')); }
+    l2.appendChild(document.createTextNode([r.sticker, [r.city, r.state].filter(Boolean).join(', ')].filter(Boolean).join(' · ')));
+    info.appendChild(top); info.appendChild(l2);
+    if (r.duplicate) { var dp = document.createElement('span'); dp.className = 'ent-dup'; dp.textContent = t('eDup'); info.appendChild(dp); }
+    c.appendChild(ph); c.appendChild(info);
+    c.addEventListener('click', function () { openPhoto(ent.rows, i); });
+    return c;
+  }
+  function entView(v) {
+    document.querySelectorAll('#repViews button').forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-v') === v ? 'true' : 'false'); });
+    el('repCounts').hidden = v !== 'counts';
+    el('repEntries').hidden = v !== 'entries';
+    el('entSearch').placeholder = t(link.kind === 'v' ? 'eSearchV' : 'eSearchP');
+    if (v === 'entries' && !ent.loaded) entLoad();
+  }
+  document.querySelectorAll('#repViews button').forEach(function (b) { b.addEventListener('click', function () { entView(b.getAttribute('data-v')); }); });
+  document.querySelectorAll('#entChips button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      ent.range = b.getAttribute('data-r');
+      document.querySelectorAll('#entChips button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      el('entDates').hidden = ent.range !== 'pick';
+      if (ent.range === 'pick' && !el('entFrom').value) { el('entFrom').value = ymd(new Date()); el('entTo').value = ymd(new Date()); }
+      entLoad();
+    });
+  });
+  ['entFrom', 'entTo'].forEach(function (id) { el(id).addEventListener('change', entLoad); });
+  var entTimer = null;
+  el('entSearch').addEventListener('input', function () { clearTimeout(entTimer); entTimer = setTimeout(entLoad, 450); });
+  el('entMore').addEventListener('click', entMore);
 
   document.querySelectorAll('.seg button').forEach(function (b) {
     b.addEventListener('click', function () {
