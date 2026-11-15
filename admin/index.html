@@ -63,6 +63,6 @@
     setTimeout(function () { direct.hidden = false; }, 8000);
     frame.src = src;
   </script>
-<script>document.addEventListener("gesturestart",function(e){e.preventDefault();});document.addEventListener("touchmove",function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});</script>
+<script>document.addEventListener("wheel",function(e){if(e.ctrlKey)e.preventDefault();},{passive:false});document.addEventListener("keydown",function(e){if((e.ctrlKey||e.metaKey)&&["+","=","-","_","0"].indexOf(e.key)!==-1)e.preventDefault();});document.addEventListener("gesturestart",function(e){e.preventDefault();});document.addEventListener("touchmove",function(e){if(e.touches&&e.touches.length>1)e.preventDefault();},{passive:false});</script>
 </body>
 </html>
