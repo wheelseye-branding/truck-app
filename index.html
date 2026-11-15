@@ -21,6 +21,14 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://wheelseye-branding.github.io/truck-app/og-image.png">
 
+  <script>
+    /* Old links (?p= / ?v= on the main page) open in their own app folder: p/ = WE Paster, v/ = WE Vendor */
+    (function () {
+      if (/\/(p|v)\/(index\.html)?$/.test(location.pathname)) return;
+      var m = location.search.match(/[?&](p|v)=/);
+      if (m) location.replace(m[1] + '/' + location.search + location.hash);
+    })();
+  </script>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon-192.png">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -45,6 +53,7 @@
     * { box-sizing: border-box; }
     [hidden] { display: none !important; }
     html, body { margin: 0; max-width: 100%; overflow-x: hidden; }
+    @supports (overflow-x: clip) { html, body { overflow-x: clip; } }
     body {
       font-family: 'Hind', 'Noto Sans', 'Noto Sans Devanagari', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       color: var(--ink); font-size: 17px; line-height: 1.45; -webkit-text-size-adjust: 100%;
@@ -160,6 +169,39 @@
     table.rep tr.total td { font-weight: 700; }
     table.rep tr.group td { background: var(--brand-soft); font-weight: 700; text-align: left; font-size: 0.85rem; color: var(--brand); }
     table.rep tr:last-child td { border-bottom: 0; }
+    /* ───── Fit & stay-on-top rules (apply to every report table, now and later) ─────
+       • Long names / emails wrap inside their column instead of pushing everything off-screen.
+       • The first (name) column stays on the left while the numbers scroll sideways.
+       • On phones and tablets a table scrolls inside its own box, so its column names stay visible. */
+    table.rep td:first-child, table.rep th:first-child,
+    table.cr-table td.l:first-child, table.cr-table th.l:first-child { white-space: normal; overflow-wrap: anywhere; word-break: normal; }
+    table.rep td:first-child, table.rep th:first-child { z-index: 2; box-shadow: 1px 0 0 var(--line, #e4e8fb); }
+    table.rep thead th, table.cr-table thead th { position: sticky; top: 0; z-index: 3; }
+    table.rep thead th:first-child { left: 0; z-index: 4; }
+    @media (max-width: 999px) {
+      table.rep td:first-child, table.rep th:first-child { width: 44vw; min-width: 140px; max-width: 46vw; }
+      table.cr-table td.l:first-child { min-width: 96px; max-width: 42vw; }
+      .table-wrap:has(> table.rep), .table-wrap:has(> table.cr-table) { max-height: 72vh; overflow: auto; }
+    }
+    .wrap-any { overflow-wrap: anywhere; }
+    /* Emails: one line, slightly smaller, swipe sideways to read the rest; a soft fade shows there is more */
+    .mscroll { display: block; max-width: 100%; overflow-x: auto; overflow-y: hidden; white-space: nowrap; font-size: 0.86em;
+      scrollbar-width: none; -webkit-overflow-scrolling: touch; overflow-wrap: normal; word-break: normal; }
+    .mscroll::-webkit-scrollbar { display: none; }
+    .mscroll.over { -webkit-mask-image: linear-gradient(to right, #000 82%, transparent); mask-image: linear-gradient(to right, #000 82%, transparent); }
+    .mscroll.over.end { -webkit-mask-image: linear-gradient(to left, #000 82%, transparent); mask-image: linear-gradient(to left, #000 82%, transparent); }
+
+
+    /* Report controls stay on top while the page scrolls */
+    #repViews { position: sticky; top: 0; z-index: 8; background: var(--paper); margin-top: 8px; padding: 6px 0; box-shadow: 0 8px 8px -8px rgba(30,58,138,.25); }
+    #repCounts > .seg { position: sticky; top: var(--rvH, 60px); z-index: 7; box-shadow: 0 0 0 8px var(--paper); }
+    #entChips { position: sticky; top: var(--rvH, 60px); z-index: 7; background: var(--paper); padding: 6px 0; margin: 4px 0 8px; }
+    /* The table box sits just below the tabs and scrolls inside, so its dates row is always in view */
+    @media (max-width: 999px) {
+      #repCounts .table-wrap:has(> table.rep) { position: sticky; top: calc(var(--rvH, 60px) + var(--sgH, 56px) + 8px); z-index: 5;
+        max-height: calc(100vh - var(--rvH, 60px) - var(--sgH, 56px) - 24px); }
+    }
+    .ent-l2 b, .who-email, #whoEmail { overflow-wrap: anywhere; }
     .num {
       min-width: 42px; min-height: 32px; padding: 2px 8px; border: 0; border-radius: 6px;
       background: transparent; color: var(--brand2); font-family: inherit; font-size: 0.95rem; font-weight: 700;
@@ -649,7 +691,7 @@
   </div><!-- /layout -->
   </div><!-- /appView -->
 
-  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v32</span></p>
+  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v34</span></p>
 </main>
 
 <!-- Pop-up: location is off -->
@@ -1205,6 +1247,7 @@
     // Laptop: scroll / trackpad pinch to zoom, double-click 1× ↔ 2.5×, drag with the mouse when zoomed
     box.addEventListener('wheel', function (e) {
       if (!im()) return;
+      if (!e.ctrlKey && Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;   // sideways swipe = next / previous photo, not zoom
       e.preventDefault();
       var f = Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015));
       z.s = Math.max(1, Math.min(4, z.s * f));
@@ -1362,7 +1405,10 @@
     var kind = prm.get('p') ? 'p' : (prm.get('v') ? 'v' : '');
     var code = prm.get('p') || prm.get('v') || '';
     if (!kind) {                                   // opened from the home-screen icon
-      var last = recall('tb_last');
+      // WE Paster opens the paster link, WE Vendor the vendor link — each remembers its own
+      var appKind = (location.pathname.match(/\/(p|v)\/(index\.html)?$/) || [])[1] || '';
+      var last = appKind ? (recall('tb_last_' + appKind) || null) : recall('tb_last');
+      if (!last && appKind) { var any = recall('tb_last'); if (any && any.kind === appKind) last = any; }
       if (last && last.kind && last.code) { kind = last.kind; code = last.code; }
     }
     if (!kind) return showLinkError('');
@@ -1381,6 +1427,7 @@
       }
       store(key, res);
       store('tb_last', { kind: kind, code: code });
+      store('tb_last_' + kind, { kind: kind, code: code });
       if (!started) startPortal(res, code);
       else if (res.kind === 'p') { el('whoVendor').textContent = res.vendor || '—'; el('whoEmail').textContent = res.email; link.vendor = res.vendor; }
     }, function (err) {
@@ -2402,7 +2449,7 @@
     tm.textContent = ent.range === 'today' || ent.range === 'yesterday' ? when.slice(-5) : when.replace(/-\d{4} /, ' ');
     top.appendChild(plate); top.appendChild(tm);
     var l2 = document.createElement('span'); l2.className = 'ent-l2';
-    if (link.kind === 'v' && r.paster) { var b = document.createElement('b'); b.textContent = r.paster; l2.appendChild(b); l2.appendChild(document.createElement('br')); }
+    if (link.kind === 'v' && r.paster) { var b = mspan(r.paster); b.style.fontWeight = '700'; b.style.color = 'var(--ink)'; l2.appendChild(b); }
     l2.appendChild(document.createTextNode([r.sticker, [r.city, r.state].filter(Boolean).join(', ')].filter(Boolean).join(' · ')));
     info.appendChild(top); info.appendChild(l2);
     if (r.duplicate) { var dp = document.createElement('span'); dp.className = 'ent-dup'; dp.textContent = t('eDup'); info.appendChild(dp); }
@@ -2410,7 +2457,16 @@
     c.addEventListener('click', function () { openPhoto(ent.rows, i); });
     return c;
   }
+  /* Heights of the sticky bars, so the next one sits just below */
+  function setBarHeights() {
+    var rv = el('repViews'), sg = document.querySelector('#repCounts > .seg');
+    if (rv) document.documentElement.style.setProperty('--rvH', (rv.offsetHeight + 8) + 'px');
+    if (sg && sg.offsetHeight) document.documentElement.style.setProperty('--sgH', (sg.offsetHeight + 8) + 'px');
+  }
+  window.addEventListener('resize', setBarHeights);
+  setTimeout(setBarHeights, 0);
   function entView(v) {
+    setTimeout(setBarHeights, 0);
     document.querySelectorAll('#repViews button').forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-v') === v ? 'true' : 'false'); });
     el('repCounts').hidden = v !== 'counts';
     el('repEntries').hidden = v !== 'entries';
@@ -2444,9 +2500,38 @@
 
   function periodLabel(p) { return p.label === 'Today' ? t('today') : (p.label === 'Overall' ? t('overall') : p.label); }
 
+  /* A name cell; an email is allowed to break just before the "@" so it fits a narrow phone */
+  function nameCell(label) {
+    var td = document.createElement('td'), s = String(label || '');
+    if (s.indexOf('@') > 0) td.appendChild(mspan(s));                 // email: one line, swipe to read
+    else td.textContent = s;
+    return td;
+  }
+  /* ── Emails that don't fit: mark them so the fade shows; the fade flips once scrolled to the end ── */
+  function msMark(root) {
+    (root || document).querySelectorAll('.mscroll').forEach(function (m) {
+      var over = m.scrollWidth > m.clientWidth + 2;
+      m.classList.toggle('over', over);
+      if (!m._ms) {
+        m._ms = true;
+        m.addEventListener('scroll', function () { m.classList.toggle('end', m.scrollLeft + m.clientWidth >= m.scrollWidth - 2); }, { passive: true });
+      }
+    });
+  }
+  function mspan(text) { var s = document.createElement('span'); s.className = 'mscroll'; s.textContent = text; s.title = text; return s; }
+  (function () {
+    var t = null;
+    try {
+      new MutationObserver(function () { clearTimeout(t); t = setTimeout(function () { msMark(); }, 60); })
+        .observe(document.body, { childList: true, subtree: true });
+    } catch (e) {}
+    window.addEventListener('resize', function () { msMark(); });
+  })();
+
   function renderReport() {
     var d = report.data;
     if (!d) return;
+    setTimeout(setBarHeights, 0);
     var g = report.group;
     var periods = d.periods[g];
     var c = d.counts[g];
@@ -2461,7 +2546,7 @@
 
     var body = hEl('tbody');
     var addRow = function (label, nums, filter, cls) {
-      var tr = hEl('tr', cls ? { class: cls } : {}, [hEl('td', { text: label })]);
+      var tr = hEl('tr', cls ? { class: cls } : {}, [nameCell(label)]);
       nums.forEach(function (n, i) {
         var td = hEl('td');
         if (n > 0) {

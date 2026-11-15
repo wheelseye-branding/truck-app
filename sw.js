@@ -1,7 +1,9 @@
 /* WheelsEye Truck Branding — keeps the app on the phone so it opens without internet.
    Change VERSION whenever index.html / config.js change, so phones pick up the new copy. */
-var VERSION = 'tb-app-v32';
-var SHELL = ['./', './index.html', './config.js', './manifest.json', './icon-192.png', './icon-512.png'];
+var VERSION = 'tb-app-v34';
+var SHELL = ['./', './index.html', './config.js', './manifest.json', './icon-192.png', './icon-512.png',
+  './p/index.html', './p/manifest.json', './v/index.html', './v/manifest.json',
+  './icon-paster-192.png', './icon-paster-512.png', './icon-vendor-192.png', './icon-vendor-512.png'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(VERSION).then(function (c) { return c.addAll(SHELL); }).then(function () { return self.skipWaiting(); }));
@@ -22,10 +24,14 @@ self.addEventListener('fetch', function (e) {
   // Only the app page itself and its files — any other page (like admin/) goes straight to the network.
   if (url.origin === self.location.origin) {
     var scope = new URL(self.registration.scope).pathname;          // e.g. /truck-app/
-    var isAppPage = url.pathname === scope || url.pathname === scope + 'index.html';
+    // App pages: the main page, and the WE Paster (p/) and WE Vendor (v/) folders
+    var rel = url.pathname.slice(scope.length);                      // '', 'index.html', 'p/', 'p/index.html', …
+    var page = { '': './index.html', 'index.html': './index.html', 'p/': './p/index.html', 'p/index.html': './p/index.html',
+                 'v/': './v/index.html', 'v/index.html': './v/index.html' }[rel];
+    var isAppPage = !!page;
     var isAppFile = SHELL.some(function (f) { return f !== './' && url.pathname === scope + f.slice(2); });
     if (!isAppPage && !isAppFile) return;
-    var key = isAppPage ? './index.html' : req;
+    var key = isAppPage ? page : req;
     var isIcon = /\.png$/i.test(url.pathname);
 
     e.respondWith(caches.open(VERSION).then(function (c) {
