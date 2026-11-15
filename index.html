@@ -377,6 +377,7 @@
     html { touch-action: manipulation; }
     .zoombox { touch-action: none; overflow: hidden; }
     .zoombox img { transform-origin: center center; will-change: transform; user-select: none; -webkit-user-drag: none; }
+    .zoombox.zoomed { cursor: grab; } .zoombox.dragging { cursor: grabbing; }
 
     .pview .pfoot { display: flex; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)); }
     .pview .pfoot > * { flex: 1; min-height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 700; text-decoration: none; }
@@ -648,7 +649,7 @@
   </div><!-- /layout -->
   </div><!-- /appView -->
 
-  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v30</span></p>
+  <p class="foot">WheelsEye · Truck Branding Programme · <span id="appVer">v31</span></p>
 </main>
 
 <!-- Pop-up: location is off -->
@@ -1143,6 +1144,13 @@
 
   /* ───── Phones: the page never zooms; only the photo in the viewer does ───── */
   document.addEventListener('gesturestart', function (e) { e.preventDefault(); });          // iPhone pinch
+  // Laptop: Ctrl + scroll / trackpad pinch and Ctrl + / − / 0 don't zoom the page (photos handle their own zoom)
+  document.addEventListener('wheel', function (e) {
+    if (e.ctrlKey && !(e.target.closest && e.target.closest('.zoombox'))) e.preventDefault();
+  }, { passive: false });
+  document.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && ['+', '=', '-', '_', '0'].indexOf(e.key) !== -1) e.preventDefault();
+  });
   document.addEventListener('touchmove', function (e) {
     if (e.touches && e.touches.length > 1 && !(e.target.closest && e.target.closest('.zoombox'))) e.preventDefault();
   }, { passive: false });
@@ -1193,6 +1201,34 @@
       if (e.touches.length === 0) { st = null; if (z.s < 1.05) reset(); }
       else if (e.touches.length === 1) { var t = e.touches[0]; st = { px: t.clientX, py: t.clientY, x: z.x, y: z.y }; }
     });
+    // Laptop: scroll / trackpad pinch to zoom, double-click 1× ↔ 2.5×, drag with the mouse when zoomed
+    box.addEventListener('wheel', function (e) {
+      if (!im()) return;
+      e.preventDefault();
+      var f = Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015));
+      z.s = Math.max(1, Math.min(4, z.s * f));
+      if (z.s <= 1.01) { z.x = 0; z.y = 0; }
+      z.pinchAt = Date.now(); clamp(); apply();
+    }, { passive: false });
+    box.addEventListener('dblclick', function (e) {
+      if (!im()) return;
+      e.preventDefault();
+      if (z.s > 1.01) reset(); else { z.s = 2.5; z.x = 0; z.y = 0; apply(); }
+      z.pinchAt = Date.now();
+    });
+    var drag = null;
+    box.addEventListener('mousedown', function (e) {
+      if (!im() || z.s <= 1.01 || e.button !== 0) return;
+      e.preventDefault();
+      drag = { px: e.clientX, py: e.clientY, x: z.x, y: z.y };
+      box.classList.add('dragging');
+    });
+    window.addEventListener('mousemove', function (e) {
+      if (!drag) return;
+      z.x = drag.x + (e.clientX - drag.px); z.y = drag.y + (e.clientY - drag.py);
+      clamp(); apply();
+    });
+    window.addEventListener('mouseup', function () { if (drag) { drag = null; box.classList.remove('dragging'); z.pinchAt = Date.now(); } });
     return {
       reset: reset,
       busy: function () { return z.s > 1.01 || Date.now() - z.pinchAt < 450; }   // no page-swipe while zoomed / just pinched
